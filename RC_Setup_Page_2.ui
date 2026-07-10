@@ -1,0 +1,1158 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.3">
+  <object class="tk.Toplevel" id="SetupFrame" named="True">
+    <property name="height">600</property>
+    <property name="overrideredirect">True</property>
+    <property name="resizable">none</property>
+    <property name="takefocus">true</property>
+    <property name="width">1024</property>
+    <containerlayout manager="pack">
+      <property name="anchor">ne</property>
+    </containerlayout>
+    <child>
+      <object class="ttk.Frame" id="setup_frm" named="True">
+        <property name="height">600</property>
+        <property name="padding">0 0</property>
+        <property name="width">1024</property>
+        <layout manager="place">
+          <property name="bordermode">outside</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+        <containerlayout manager="grid">
+          <property name="anchor">sw</property>
+        </containerlayout>
+        <child>
+          <object class="tk.Text" id="msg_box_tx" named="True">
+            <property name="height">3</property>
+            <property name="state">normal</property>
+            <property name="width">50</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.207</property>
+              <property name="relwidth">.96</property>
+              <property name="relx">.02</property>
+              <property name="rely">.671</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="balloon_sw_test_frm" named="True">
+            <property name="height">200</property>
+            <property name="text" translatable="yes"> Balloon Solenoid Valve Test</property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.19</property>
+              <property name="relwidth">.45</property>
+              <property name="relx">.02</property>
+              <property name="rely">.470</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Checkbutton" id="bal_sol_en_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_bal_sol_en</property>
+                <property name="offvalue">False</property>
+                <property name="onvalue">True</property>
+                <property name="text" translatable="yes">Enable</property>
+                <property name="variable">boolean:bal_sol_track_checked</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.07</property>
+                  <property name="rely">.0</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="label17">
+                <property name="text" translatable="yes">SV3 Pressure
+ % Open</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.05</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="label18">
+                <property name="text" translatable="yes">SV5 Relief
+ % Open</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.05</property>
+                  <property name="rely">.6</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Scale" id="v_bal_press_sol_sldr" named="True">
+                <property name="command" type="command" cbtype="scale">callback_bal_press_sol</property>
+                <property name="from_">0</property>
+                <property name="orient">horizontal</property>
+                <property name="showvalue">true</property>
+                <property name="state">normal</property>
+                <property name="to">100</property>
+                <property name="variable">int:v_bal_press_sol</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relwidth">.72</property>
+                  <property name="relx">.25</property>
+                  <property name="rely">.01</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Scale" id="v_bal_relief_sol_sldr" named="True">
+                <property name="command" type="command" cbtype="scale">callback_bal_relief_sol</property>
+                <property name="from_">0</property>
+                <property name="orient">horizontal</property>
+                <property name="showvalue">true</property>
+                <property name="state">normal</property>
+                <property name="to">100</property>
+                <property name="variable">int:v_bal_relief_sol</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relwidth">.72</property>
+                  <property name="relx">.25</property>
+                  <property name="rely">.5</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="clamp_sw_test_frm" named="True">
+            <property name="height">200</property>
+            <property name="text" translatable="yes">Chuck Solenoid Valve Test</property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.19</property>
+              <property name="relwidth">.45</property>
+              <property name="relx">0.53</property>
+              <property name="rely">.470</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Checkbutton" id="clamp_sol_en_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_clamp_sol_en</property>
+                <property name="offvalue">False</property>
+                <property name="onvalue">True</property>
+                <property name="text" translatable="yes">Enable</property>
+                <property name="variable">boolean:clamp_sol_track_checked</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.07</property>
+                  <property name="rely">.0</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="label1">
+                <property name="text" translatable="yes">SV4 Pressure
+ % Open</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.05</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="label2">
+                <property name="text" translatable="yes">SV6 Relief
+ % Open</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.05</property>
+                  <property name="rely">.6</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Scale" id="v_clamp_press_sol_sldr" named="True">
+                <property name="command" type="command" cbtype="scale">callback_chuck_press_sol</property>
+                <property name="from_">0</property>
+                <property name="orient">horizontal</property>
+                <property name="showvalue">true</property>
+                <property name="to">100</property>
+                <property name="variable">int:v_clamp_press_sol</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relwidth">.72</property>
+                  <property name="relx">.25</property>
+                  <property name="rely">.01</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Scale" id="v_clamp_relief_sol_sldr" named="True">
+                <property name="command" type="command" cbtype="scale">callback_chuck_relief_sol</property>
+                <property name="from_">0</property>
+                <property name="orient">horizontal</property>
+                <property name="showvalue">true</property>
+                <property name="to">100</property>
+                <property name="variable">int:v_clamp_relief_sol</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relwidth">.72</property>
+                  <property name="relx">.25</property>
+                  <property name="rely">.5</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="bn_exit" named="True">
+            <property name="command" type="command" cbtype="simple">btn_exit</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="takefocus">false</property>
+            <property name="text" translatable="yes">Exit</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.095</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">.02</property>
+              <property name="rely">.885</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="cur_bal_press_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes"> Current Balloon Pressure  (atm)  </property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">0.13</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.02</property>
+              <property name="rely">0.015</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="cur_bal_press_str" named="True">
+                <property name="font">{Arial} 28 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">0 0</property>
+                <property name="textvariable">string:balloon_press_str</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.5</property>
+                  <property name="rely">0.45</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="cur_dia_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes">  Current Diameter (mm)   </property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">0.13</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.27</property>
+              <property name="rely">0.015</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="cur_dia_str" named="True">
+                <property name="font">{Arial} 28 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">0 0</property>
+                <property name="textvariable">string:cur_dia_mm_str</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.5</property>
+                  <property name="rely">0.45</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="cur_clamp_press_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes">  Current Chuck Pressure  (atm)  </property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">0.13</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.53</property>
+              <property name="rely">0.015</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="cur_clamp_press_str" named="True">
+                <property name="font">{Arial} 28 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">0 0</property>
+                <property name="textvariable">string:clamp_press_str</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.5</property>
+                  <property name="rely">0.45</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="cur_position_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes">  Current Position (inch)  </property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">0.13</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.78</property>
+              <property name="rely">0.015</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="cur_position_str" named="True">
+                <property name="font">{Arial} 28 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">0 0</property>
+                <property name="textvariable">string:cur_pos_str</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.5</property>
+                  <property name="rely">0.45</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="trgt_bal_press_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes"> Balloon Pressure Target (xx) </property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">0.19</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.02</property>
+              <property name="rely">0.269</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="tk.Entry" id="bal_trgt_press_str_id" named="True">
+                <property name="exportselection">false</property>
+                <property name="font">{Arial} 24 {}</property>
+                <property name="justify">center</property>
+                <property name="relief">solid</property>
+                <property name="textvariable">string:bal_trgt_press_str</property>
+                <property name="width">6</property>
+                <layout manager="place">
+                  <property name="anchor">n</property>
+                  <property name="relx">0.375</property>
+                  <property name="rely">0.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Scale" id="bal_trgt_press_sldr" named="True">
+                <property name="borderwidth">2</property>
+                <property name="command" type="command" cbtype="scale">bal_target_press_call</property>
+                <property name="font">{Arial} 12 {}</property>
+                <property name="from_">150.0</property>
+                <property name="orient">vertical</property>
+                <property name="relief">flat</property>
+                <property name="resolution">0.1</property>
+                <property name="showvalue">false</property>
+                <property name="sliderlength">30</property>
+                <property name="to">0.0</property>
+                <property name="variable">double:v_bal_target_press</property>
+                <property name="width">30</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relheight">.9</property>
+                  <property name="relwidth">.20</property>
+                  <property name="relx">.75</property>
+                  <property name="rely">.05</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Checkbutton" id="bal_track_en_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_bal_track_en</property>
+                <property name="font">{Arial} 9 {}</property>
+                <property name="offvalue">0</property>
+                <property name="onvalue">1</property>
+                <property name="text" translatable="yes">Enable Tracking</property>
+                <property name="variable">boolean:bal_track_checked</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.12</property>
+                  <property name="rely">.6</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="bal_cal_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes">  Balloon Pressure Calibration </property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">0.19</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.27</property>
+              <property name="rely">0.269</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Checkbutton" id="balloon_cal_en_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_bal_cal_cb</property>
+                <property name="text" translatable="yes">Enable</property>
+                <property name="variable">boolean:bal_cal_checked</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.07</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Scale" id="bal_cal_ref_sldr" named="True">
+                <property name="borderwidth">2</property>
+                <property name="command" type="command" cbtype="scale">bal_ref_press_call</property>
+                <property name="font">{arial} 6 {}</property>
+                <property name="from_">150.0</property>
+                <property name="orient">vertical</property>
+                <property name="relief">flat</property>
+                <property name="resolution">.01</property>
+                <property name="showvalue">false</property>
+                <property name="sliderlength">30</property>
+                <property name="to">9.00</property>
+                <property name="variable">double:v_bal_ref_sldr</property>
+                <property name="width">30</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relheight">.9</property>
+                  <property name="relwidth">.20</property>
+                  <property name="relx">.795</property>
+                  <property name="rely">.05</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Entry" id="bal_cal_ref_press_str" named="True">
+                <property name="exportselection">false</property>
+                <property name="font">{Arial} 16 {}</property>
+                <property name="justify">center</property>
+                <property name="relief">solid</property>
+                <property name="textvariable">string:bal_ref_press_str</property>
+                <property name="width">7</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.58</property>
+                  <property name="rely">0.45</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="button2">
+                <property name="command" type="command" cbtype="simple">callback_bal_cal_store</property>
+                <property name="font">{arial} 9 {}</property>
+                <property name="text" translatable="yes">Store Cal</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.38</property>
+                  <property name="rely">.65</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="bal_scale_cal_rb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_bal_cal_rb</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">Scale</property>
+                <property name="value">scale</property>
+                <property name="variable">string:v_bal_cal_rb</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.07</property>
+                  <property name="rely">.45</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="bal_zero_cal_rb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_bal_cal_rb</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">Zero</property>
+                <property name="value">zero</property>
+                <property name="variable">string:v_bal_cal_rb</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.07</property>
+                  <property name="rely">.7</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="label25" named="True">
+                <property name="font">{Arial} 6 {}</property>
+                <property name="justify">center</property>
+                <property name="text" translatable="yes">Reference
+Meter Value psi </property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">0.44</property>
+                  <property name="rely">0.03</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Labelframe" id="labelframe9">
+            <property name="height">200</property>
+            <property name="text" translatable="yes">  Chuck Pressure Calibration  </property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">0.19</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.78</property>
+              <property name="rely">0.269</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="clamp_cal_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes">  Chuck Pressure Calibration </property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">0.19</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.78</property>
+              <property name="rely">0.269</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Checkbutton" id="clamp_cal_en_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_clamp_cal_cb</property>
+                <property name="offvalue">0</property>
+                <property name="onvalue">1</property>
+                <property name="text" translatable="yes">Enable</property>
+                <property name="variable">boolean:clamp_cal_checked</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.07</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Scale" id="clamp_cal_ref_sldr" named="True">
+                <property name="borderwidth">2</property>
+                <property name="command" type="command" cbtype="scale">clamp_ref_press_call</property>
+                <property name="font">{arial} 6 {}</property>
+                <property name="from_">150</property>
+                <property name="orient">vertical</property>
+                <property name="relief">flat</property>
+                <property name="resolution">.1</property>
+                <property name="showvalue">false</property>
+                <property name="sliderlength">30</property>
+                <property name="to">9.0</property>
+                <property name="variable">double:v_clamp_ref_sldr</property>
+                <property name="width">30</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relheight">.9</property>
+                  <property name="relwidth">.20</property>
+                  <property name="relx">.79</property>
+                  <property name="rely">.05</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Entry" id="clamp_cal_ref_press_str" named="True">
+                <property name="exportselection">false</property>
+                <property name="font">{Arial} 16 {}</property>
+                <property name="justify">center</property>
+                <property name="relief">solid</property>
+                <property name="textvariable">string:clamp_ref_press_str</property>
+                <property name="width">6</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.58</property>
+                  <property name="rely">0.45</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="button4">
+                <property name="command" type="command" cbtype="simple">callback_clamp_cal_store</property>
+                <property name="font">{arial} 9 {}</property>
+                <property name="text" translatable="yes">Store Cal</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.38</property>
+                  <property name="rely">.65</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="clamp_scale_cal_rb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_clamp_cal_rb</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">Scale</property>
+                <property name="value">scale</property>
+                <property name="variable">string:v_clamp_cal_rb</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.07</property>
+                  <property name="rely">.45</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="clamp_zero_cal_rb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_clamp_cal_rb</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">Zero</property>
+                <property name="value">zero</property>
+                <property name="variable">string:v_clamp_cal_rb</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.07</property>
+                  <property name="rely">.7</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="label27" named="True">
+                <property name="font">{Arial} 6 {}</property>
+                <property name="justify">center</property>
+                <property name="text" translatable="yes">Reference
+Meter Value psi </property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">0.44</property>
+                  <property name="rely">0.03</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="trgt_c_press_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes">  Chuck Pressure Target  (atm) </property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">0.19</property>
+              <property name="relwidth">.225</property>
+              <property name="relx">0.53</property>
+              <property name="rely">0.269</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="tk.Entry" id="clamp_trgt_press_str_id" named="True">
+                <property name="exportselection">false</property>
+                <property name="font">{Arial} 24 {}</property>
+                <property name="justify">center</property>
+                <property name="relief">solid</property>
+                <property name="textvariable">string:clamp_trgt_press_str</property>
+                <property name="width">5</property>
+                <layout manager="place">
+                  <property name="anchor">n</property>
+                  <property name="relx">0.241</property>
+                  <property name="rely">0.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Scale" id="clamp_trgt_press_sldr" named="True">
+                <property name="borderwidth">1</property>
+                <property name="command" type="command" cbtype="scale">clamp_target_press_call</property>
+                <property name="font">{arial} 6 {}</property>
+                <property name="from_">150.0</property>
+                <property name="orient">vertical</property>
+                <property name="relief">flat</property>
+                <property name="resolution">1</property>
+                <property name="showvalue">false</property>
+                <property name="sliderlength">30</property>
+                <property name="to">0.0</property>
+                <property name="variable">double:v_clamp_target_press</property>
+                <property name="width">30</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relheight">.9</property>
+                  <property name="relwidth">.16</property>
+                  <property name="relx">.482</property>
+                  <property name="rely">.05</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Checkbutton" id="clamp_track_en_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_clamp_track_en</property>
+                <property name="font">{arial} 8 {}</property>
+                <property name="offvalue">0</property>
+                <property name="onvalue">1</property>
+                <property name="text" translatable="yes">Enable Tracking</property>
+                <property name="variable">boolean:clamp_track_checked</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.02</property>
+                  <property name="rely">.6</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.LabelFrame" id="clamps_frm" named="True">
+                <property name="font">{arial} 9 {}</property>
+                <property name="height">200</property>
+                <property name="text" translatable="yes">Chucks 
+on/off </property>
+                <property name="width">200</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relheight">.9</property>
+                  <property name="relwidth">.28</property>
+                  <property name="relx">.68</property>
+                  <property name="rely">.05</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+                <child>
+                  <object class="ttk.Checkbutton" id="clamp_right_cb" named="True">
+                    <property name="command" type="command" cbtype="simple">callback_right_clamp_cb</property>
+                    <property name="offvalue">0</property>
+                    <property name="onvalue">1</property>
+                    <property name="state">normal</property>
+                    <property name="text" translatable="yes">Right</property>
+                    <property name="variable">int:right_clamp_enabled</property>
+                    <layout manager="place">
+                      <property name="anchor">nw</property>
+                      <property name="relx">.1</property>
+                      <property name="rely">.535</property>
+                      <property name="x">0</property>
+                      <property name="y">0</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Checkbutton" id="clamp_left_cb" named="True">
+                    <property name="command" type="command" cbtype="simple">callback_left_clamp_cb</property>
+                    <property name="offvalue">0</property>
+                    <property name="onvalue">1</property>
+                    <property name="text" translatable="yes">Left</property>
+                    <property name="variable">int:left_clamp_enabled</property>
+                    <layout manager="place">
+                      <property name="anchor">nw</property>
+                      <property name="relx">.1</property>
+                      <property name="rely">.1</property>
+                      <property name="x">0</property>
+                      <property name="y">0</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="balloon_press_units_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes"> Balloon Pressure Units</property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.098</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">.02</property>
+              <property name="rely">.158</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Radiobutton" id="bal_atm_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_bal_units</property>
+                <property name="text" translatable="yes">atm</property>
+                <property name="value">atm</property>
+                <property name="variable">string:v_bal_units</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.1</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="bal_bar_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_bal_units</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">bar</property>
+                <property name="value">bar</property>
+                <property name="variable">string:v_bal_units</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.4</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="bal_psi_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_bal_units</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">psi</property>
+                <property name="value">psi</property>
+                <property name="variable">string:v_bal_units</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">0.7</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="clamp_press_units_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes"> Chuck Pressure Units</property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.098</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.53</property>
+              <property name="rely">.158</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Radiobutton" id="clamp_atm_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_clamp_units</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">atm</property>
+                <property name="value">atm</property>
+                <property name="variable">string:v_clampl_units</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.1</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="clamp_bar_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_clamp_units</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">bar</property>
+                <property name="value">bar</property>
+                <property name="variable">string:v_clampl_units</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.4</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="clamp_psi_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_clamp_units</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">psi</property>
+                <property name="value">psi</property>
+                <property name="variable">string:v_clampl_units</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">0.7</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="dia_units_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes"> Diameter Units</property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.098</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.27</property>
+              <property name="rely">.158</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Radiobutton" id="dia_mm_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_dia_units</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">mm</property>
+                <property name="value">mm</property>
+                <property name="variable">string:v_dia_units</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.17</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="dia_inch_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_dia_units</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">inch</property>
+                <property name="value">inch</property>
+                <property name="variable">string:v_dia_units</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.58</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="position_units_frm" named="True">
+            <property name="font">{arial} 9 {}</property>
+            <property name="height">200</property>
+            <property name="text" translatable="yes"> Position Units</property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.098</property>
+              <property name="relwidth">.2</property>
+              <property name="relx">0.78</property>
+              <property name="rely">.158</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Radiobutton" id="pos_mm_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_pos_units</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">mm</property>
+                <property name="value">mm</property>
+                <property name="variable">string:v_pos_units</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.17</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="pos_inch_cb" named="True">
+                <property name="command" type="command" cbtype="simple">callback_pos_units</property>
+                <property name="compound">center</property>
+                <property name="text" translatable="yes">inch</property>
+                <property name="value">inch</property>
+                <property name="variable">string:v_pos_units</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relx">.58</property>
+                  <property name="rely">.2</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="prox_left_frm" named="True">
+            <property name="font">{arial} 8 {}</property>
+            <property name="labelanchor">n</property>
+            <property name="text" translatable="yes">Proximal Left</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.095</property>
+              <property name="relwidth">.088</property>
+              <property name="relx">.782</property>
+              <property name="rely">.885</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="tk.Checkbutton" id="cb_prox_left" named="True">
+                <property name="command" type="command" cbtype="simple">callback_flip_cone</property>
+                <property name="font">{arial} 8 {}</property>
+                <property name="offvalue">0</property>
+                <property name="onvalue">1</property>
+                <property name="text" translatable="yes"></property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.5</property>
+                  <property name="rely">0.5</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="cur_input_press_frm" named="True">
+            <property name="font">{arial} 8 {}</property>
+            <property name="labelanchor">n</property>
+            <property name="text" translatable="yes">Input Pressure (psi)</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.095</property>
+              <property name="relwidth">.112</property>
+              <property name="relx">.878</property>
+              <property name="rely">.885</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="tk.Label" id="cur_input_press_str" named="True">
+                <property name="anchor">center</property>
+                <property name="font">{Arial} 14 {}</property>
+                <property name="text" translatable="yes">0.0</property>
+                <property name="textvariable">string:input_press_str</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.5</property>
+                  <property name="rely">0.55</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

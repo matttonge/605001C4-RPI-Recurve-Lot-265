@@ -1,0 +1,719 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.3">
+  <object class="tk.Toplevel" id="toplevel1">
+    <property name="geometry">1024x600</property>
+    <property name="height">600</property>
+    <property name="width">1024</property>
+    <child>
+      <object class="tk.Frame" id="frame1">
+        <property name="height">600</property>
+        <property name="width">1024</property>
+        <layout manager="place">
+          <property name="anchor">nw</property>
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+        <child>
+          <object class="tk.Frame" id="frame4">
+            <property name="height">235</property>
+            <property name="width">1024</property>
+            <layout manager="place">
+              <property name="anchor">center</property>
+              <property name="relx">.5</property>
+              <property name="rely">.8</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="tk.Button" id="btn_1" named="True">
+                <property name="command" type="command" cbtype="with_wid">callback_kb</property>
+                <property name="compound">center</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">1</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.195</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_2" named="True">
+                <property name="command" type="command" cbtype="with_wid">callback_kb</property>
+                <property name="compound">center</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">2</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.256</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_3" named="True">
+                <property name="command" type="command" cbtype="with_wid">callback_kb</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">3</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.317</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_4" named="True">
+                <property name="command" type="command" cbtype="with_wid">callback_kb</property>
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="overrelief">flat</property>
+                <property name="text" translatable="yes">4</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.378</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_5" named="True">
+                <property name="command" type="command" cbtype="with_wid">callback_kb</property>
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">5</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.439</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_6" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">6</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.5</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_7" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">7</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.561</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_8" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">8</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.622</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_9" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">9</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.683</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_0" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">0</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.744</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_bs" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Courier} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">&lt;-</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.805</property>
+                  <property name="rely">.1</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_q" named="True">
+                <property name="compound">center</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">q</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.195</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_w" named="True">
+                <property name="compound">center</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">w</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.256</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_e" named="True">
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">e</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.317</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_r" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="overrelief">flat</property>
+                <property name="text" translatable="yes">r</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.378</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_t" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">t</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.439</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_y" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">y</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.5</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_u" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">u</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.561</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_i" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">i</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.622</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_o" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">o</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.683</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_p" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">p</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.744</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn__" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">_</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.805</property>
+                  <property name="rely">.341</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_a" named="True">
+                <property name="compound">center</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">a</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.195</property>
+                  <property name="rely">.582</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_s" named="True">
+                <property name="compound">center</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">s</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.256</property>
+                  <property name="rely">.582</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_d" named="True">
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">d</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.317</property>
+                  <property name="rely">.582</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_f" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="overrelief">flat</property>
+                <property name="text" translatable="yes">f</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.378</property>
+                  <property name="rely">.582</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_g" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">g</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.439</property>
+                  <property name="rely">.582</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_h" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">h</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.5</property>
+                  <property name="rely">.582</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_j" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">j</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.561</property>
+                  <property name="rely">.582</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_k" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">k</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.622</property>
+                  <property name="rely">.582</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_l" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">l</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.683</property>
+                  <property name="rely">.582</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_entr" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="justify">left</property>
+                <property name="text" translatable="yes">Enter</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.11</property>
+                  <property name="relx">.775</property>
+                  <property name="rely">.582</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_z" named="True">
+                <property name="compound">center</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">z</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.195</property>
+                  <property name="rely">.823</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_x" named="True">
+                <property name="compound">center</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">x</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.256</property>
+                  <property name="rely">.823</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_c" named="True">
+                <property name="font">{Arial} 20 {}</property>
+                <property name="text" translatable="yes">c</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.317</property>
+                  <property name="rely">.823</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_v" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="overrelief">flat</property>
+                <property name="text" translatable="yes">v</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.378</property>
+                  <property name="rely">.823</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_b" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">b</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.439</property>
+                  <property name="rely">.823</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_n" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">n</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.5</property>
+                  <property name="rely">.823</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_m" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="state">normal</property>
+                <property name="text" translatable="yes">m</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.05</property>
+                  <property name="relx">.561</property>
+                  <property name="rely">.823</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="btn_spc" named="True">
+                <property name="compound">right</property>
+                <property name="font">{Arial} 20 {}</property>
+                <property name="justify">left</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">.2</property>
+                  <property name="relwidth">.23</property>
+                  <property name="relx">.713</property>
+                  <property name="rely">.823</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Combobox" id="cb1" named="True">
+            <property name="textvariable">string:cb1_text</property>
+            <layout manager="place">
+              <property name="anchor">center</property>
+              <property name="relx">0.50</property>
+              <property name="rely">0.10</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="pygubu.builder.widgets.editabletreeview" id="editabletreeview2">
+            <property name="selectmode">extended</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

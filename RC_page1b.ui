@@ -1,0 +1,803 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.3">
+  <object class="tk.Toplevel" id="SetupFrame" named="True">
+    <property name="borderwidth">1</property>
+    <property name="container">false</property>
+    <property name="height">600</property>
+    <property name="overrideredirect">True</property>
+    <property name="resizable">none</property>
+    <property name="takefocus">true</property>
+    <property name="width">1024</property>
+    <containerlayout manager="pack">
+      <property name="anchor">ne</property>
+    </containerlayout>
+    <child>
+      <object class="ttk.Frame" id="main_frm" named="True">
+        <property name="height">600</property>
+        <property name="padding">1</property>
+        <property name="takefocus">true</property>
+        <property name="width">1024</property>
+        <bind sequence="&lt;ButtonPress&gt;" handler="callback_NEXT" add="True" />
+        <layout manager="place">
+          <property name="x">0</property>
+          <property name="y">0</property>
+        </layout>
+        <containerlayout manager="pack">
+          <property name="anchor">sw</property>
+        </containerlayout>
+        <child>
+          <object class="ttk.Frame" id="frame1">
+            <property name="height">220</property>
+            <property name="width">1000</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relx">.012</property>
+              <property name="rely">.085</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="balloon_png" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 12 {}</property>
+                <property name="image">Part 1 Drawing 7e.png</property>
+                <property name="relief">groove</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="cone_G_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 8 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">0 0</property>
+                <property name="text" translatable="yes">G</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_G" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.205</property>
+                  <property name="rely">.094</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="body_B_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 8 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">0 0</property>
+                <property name="text" translatable="yes">B</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_B" add="" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.505</property>
+                  <property name="rely">.094</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="cone_H_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 8 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">0 0</property>
+                <property name="text" translatable="yes">H</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_H" add="" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.788</property>
+                  <property name="rely">.094</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="distal_neck_od_D_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 8 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">7 0</property>
+                <property name="text" translatable="yes">D</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_D" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.07</property>
+                  <property name="rely">.62965</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="prox_neck_od_F_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 8 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">7 0</property>
+                <property name="text" translatable="yes">F</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_F" add="" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.935</property>
+                  <property name="rely">.62965</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="body_A_Left_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 8 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">3 0</property>
+                <property name="text" translatable="yes">A1</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_A_dia_1" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.3075</property>
+                  <property name="rely">00.838</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="body_A_mid_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 8 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">3 0</property>
+                <property name="text" translatable="yes">A2</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_A_dia_2" add="" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.558</property>
+                  <property name="rely">.838</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="body_A_right_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 8 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">3 0</property>
+                <property name="text" translatable="yes">A3</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_A_dia_3" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.6975</property>
+                  <property name="rely">.838</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="dis_cone_pos_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 9 {bold italic}</property>
+                <property name="justify">center</property>
+                <property name="padding">3 0</property>
+                <property name="text" translatable="yes">Left Cone</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_left_Cone" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.22</property>
+                  <property name="rely">.81</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="zero_pos_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 9 {bold italic}</property>
+                <property name="justify">center</property>
+                <property name="padding">4 0</property>
+                <property name="text" translatable="yes">Zero</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_0" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.146</property>
+                  <property name="rely">.8</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="prox_cone_pos_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 9 {bold italic}</property>
+                <property name="justify">center</property>
+                <property name="padding">4 0</property>
+                <property name="text" translatable="yes">Right Cone</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_right_Cone" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.79</property>
+                  <property name="rely">.81</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="prox_neck_pos_lbl" named="True">
+                <property name="background">#ffffff</property>
+                <property name="font">{Arial} 9 {bold italic}</property>
+                <property name="justify">center</property>
+                <property name="padding">4 0</property>
+                <property name="text" translatable="yes">Right Neck</property>
+                <bind sequence="&lt;ButtonPress&gt;" handler="callback_right_neck" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relx">0.87</property>
+                  <property name="rely">.81</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Labelframe" id="labelframe1">
+            <property name="height">200</property>
+            <property name="takefocus">true</property>
+            <property name="text" translatable="yes">Lot Number</property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.075</property>
+              <property name="relwidth">.18</property>
+              <property name="relx">.015</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Combobox" id="entry1_" named="True">
+                <property name="textvariable">string:entry1_text</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relwidth">.97</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="Load_Balloon_btn" named="True">
+            <property name="font">{Arial} 9 {}</property>
+            <property name="justify">left</property>
+            <property name="takefocus">false</property>
+            <property name="text" translatable="yes">Load 
+Balloon</property>
+            <bind sequence="&lt;ButtonPress&gt;" handler="callback_Load_Button" add="True" />
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">0.77</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="Auto_btn" named="True">
+            <property name="compound">center</property>
+            <property name="font">{arial} 10 {}</property>
+            <property name="text" translatable="yes">Auto</property>
+            <bind sequence="&lt;ButtonPress&gt;" handler="callback_Auto" add="True" />
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">0.8425</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="Manual_btn" named="True">
+            <property name="compound">center</property>
+            <property name="font">{arial} 10 {}</property>
+            <property name="text" translatable="yes">Manual</property>
+            <bind sequence="&lt;ButtonPress&gt;" handler="callback_Manual" add="True" />
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">0.916</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Text" id="message_txt" named="True">
+            <property name="font">{Arial} 12 {}</property>
+            <property name="height">10</property>
+            <property name="relief">flat</property>
+            <property name="setgrid">true</property>
+            <property name="state">normal</property>
+            <property name="tabstyle">wordprocessor</property>
+            <property name="width">50</property>
+            <layout manager="place">
+              <property name="anchor">center</property>
+              <property name="relheight">.122</property>
+              <property name="relwidth">.975</property>
+              <property name="relx">.5</property>
+              <property name="rely">0.853</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="bn_exit" named="True">
+            <property name="command" type="command" cbtype="simple">btn_exit</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="takefocus">false</property>
+            <property name="text" translatable="yes">Exit</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.06</property>
+              <property name="relx">.01</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="bn_setup" named="True">
+            <property name="command" type="command" cbtype="simple">btn_setup</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="text" translatable="yes">Setup</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">0.074</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="get_data_btn" named="True">
+            <property name="command" type="command" cbtype="simple">callback_get_data</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="text" translatable="yes">Get Data</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">.5</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="set_bal_target_btn" named="True">
+            <property name="command" type="command" cbtype="simple">callback_set_balloon_target</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="text" translatable="yes">Set Balloon
+Target</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.10</property>
+              <property name="relx">.17</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="set_chuck_target_btn" named="True">
+            <property name="command" type="command" cbtype="simple">callback_set_chuck_target</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="text" translatable="yes">Set Chuck
+Target</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.10</property>
+              <property name="relx">.285</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="dist_chuck_btn" named="True">
+            <property name="command" type="command" cbtype="simple">callback_dist_chuck</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="takefocus">false</property>
+            <property name="text" translatable="yes">Left
+Chuck</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.062</property>
+              <property name="relx">0.733</property>
+              <property name="rely">.005</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="input_press_frm" named="True">
+            <property name="font">{arial} 8 {}</property>
+            <property name="highlightbackground">#c0c0c0</property>
+            <property name="text" translatable="yes">Input Pressure atm</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.075</property>
+              <property name="relwidth">.134</property>
+              <property name="relx">.346</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="input_press_lbl" named="True">
+                <property name="font">{Arial} 12 {}</property>
+                <property name="justify">right</property>
+                <property name="padding">0 0</property>
+                <property name="textvariable">string:input_press_str</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">1.0</property>
+                  <property name="relx">.735</property>
+                  <property name="rely">0.4</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="chuck_press_frm" named="True">
+            <property name="font">{arial} 8 {}</property>
+            <property name="highlightbackground">#c0c0c0</property>
+            <property name="text" translatable="yes">Chuck Pressure atm</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.075</property>
+              <property name="relwidth">.134</property>
+              <property name="relx">.488</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="chuck_press_lbl" named="True">
+                <property name="font">{Arial} 12 {}</property>
+                <property name="justify">right</property>
+                <property name="padding">0 0</property>
+                <property name="textvariable">string:chuck_press_str</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">1.0</property>
+                  <property name="relx">.735</property>
+                  <property name="rely">0.4</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="chuck_track_btn" named="True">
+                <property name="command" type="command" cbtype="simple">callback_chuck_track_btn</property>
+                <property name="font">{arial} 9 {}</property>
+                <property name="text" translatable="yes">Track</property>
+                <layout manager="place">
+                  <property name="anchor">se</property>
+                  <property name="relheight">.7</property>
+                  <property name="relwidth">.4</property>
+                  <property name="relx">.46</property>
+                  <property name="rely">.8</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="pos_mm_frm" named="True">
+            <property name="font">{arial} 8 {}</property>
+            <property name="highlightbackground">#c0c0c0</property>
+            <property name="text" translatable="yes"> Position  mm</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.075</property>
+              <property name="relwidth">.090</property>
+              <property name="relx">.633</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="cur_pos_lbl" named="True">
+                <property name="font">{Arial} 12 {}</property>
+                <property name="justify">center</property>
+                <property name="padding">0 0</property>
+                <property name="textvariable">string:cur_pos_str</property>
+                <bind sequence="&lt;Activate&gt;" handler="callback" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">1.0</property>
+                  <property name="relx">0.5</property>
+                  <property name="rely">0.4</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="bal_press_frm" named="True">
+            <property name="font">{arial} 8 {}</property>
+            <property name="text" translatable="yes">Balloon Pressure atm</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.075</property>
+              <property name="relwidth">.135</property>
+              <property name="relx">.204</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="balloon_press_lbl" named="True">
+                <property name="font">{Arial} 12 {}</property>
+                <property name="justify">right</property>
+                <property name="padding">0 0</property>
+                <property name="textvariable">string:balloon_press_str</property>
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">1</property>
+                  <property name="relx">.735</property>
+                  <property name="rely">.4</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="bal_track_btn" named="True">
+                <property name="command" type="command" cbtype="simple">callback_bal_track_btn</property>
+                <property name="font">{arial} 9 {}</property>
+                <property name="overrelief">flat</property>
+                <property name="text" translatable="yes">Track</property>
+                <layout manager="place">
+                  <property name="anchor">se</property>
+                  <property name="relheight">.7</property>
+                  <property name="relwidth">.4</property>
+                  <property name="relx">.46</property>
+                  <property name="rely">.8</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.LabelFrame" id="dia_lbl_frm2" named="True">
+            <property name="font">{arial} 8 {}</property>
+            <property name="highlightbackground">#c0c0c0</property>
+            <property name="text" translatable="yes">Diameter  mm  (in)</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.075</property>
+              <property name="relwidth">.134</property>
+              <property name="relx">.346</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="cur_dia_mm_lbl" named="True">
+                <property name="font">{Arial} 12 {}</property>
+                <property name="justify">right</property>
+                <property name="padding">4 0</property>
+                <property name="textvariable">string:cur_dia_mm_str</property>
+                <bind sequence="&lt;Activate&gt;" handler="callback" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">1</property>
+                  <property name="relx">.25</property>
+                  <property name="rely">.4</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="cur_dia_in_lbl" named="True">
+                <property name="font">{Arial} 12 {}</property>
+                <property name="justify">right</property>
+                <property name="padding">5 0</property>
+                <property name="textvariable">string:cur_dia_in_str</property>
+                <bind sequence="&lt;Activate&gt;" handler="callback" add="True" />
+                <layout manager="place">
+                  <property name="anchor">center</property>
+                  <property name="relheight">1</property>
+                  <property name="relx">.67</property>
+                  <property name="rely">.4</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="prox_chuck_btn" named="True">
+            <property name="command" type="command" cbtype="simple">callback_prox_chuck</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="takefocus">false</property>
+            <property name="text" translatable="yes">Right
+Chuck</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.062</property>
+              <property name="relx">0.798</property>
+              <property name="rely">.005</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="dist_clamp_btn" named="True">
+            <property name="command" type="command" cbtype="simple">callback_dist_clamp</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="takefocus">false</property>
+            <property name="text" translatable="yes">Left
+Clamp</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.062</property>
+              <property name="relx">0.863</property>
+              <property name="rely">.005</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="prox_clamp_btn" named="True">
+            <property name="command" type="command" cbtype="simple">callback_prox_clamp</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="takefocus">false</property>
+            <property name="text" translatable="yes">Right
+Clamp</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.062</property>
+              <property name="relx">0.928</property>
+              <property name="rely">.005</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Frame" id="sb_frame" named="True">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="place">
+              <property name="anchor">center</property>
+              <property name="relwidth">.975</property>
+              <property name="relx">.5</property>
+              <property name="rely">.615</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+            <containerlayout manager="place">
+              <property name="propagate">False</property>
+            </containerlayout>
+            <child>
+              <object class="ttk.Treeview" id="treeview1">
+                <property name="selectmode">none</property>
+                <property name="style">MyTView.Treeview</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relheight">1</property>
+                  <property name="relwidth">.96</property>
+                  <property name="relx">0.0</property>
+                  <property name="rely">0.0</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Scrollbar" id="tree_scrollbar" named="True">
+                <property name="orient">vertical</property>
+                <layout manager="place">
+                  <property name="anchor">nw</property>
+                  <property name="relheight">1</property>
+                  <property name="relwidth">.04</property>
+                  <property name="relx">.96</property>
+                  <property name="x">0</property>
+                  <property name="y">0</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="button_save_data" named="True">
+            <property name="command" type="command" cbtype="simple">callback_save_data</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="justify">center</property>
+            <property name="text" translatable="yes">Save Data
+File (.xlsx)</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">.573</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="button1" named="True">
+            <property name="command" type="command" cbtype="simple">callback_clear_data</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="justify">center</property>
+            <property name="relief">raised</property>
+            <property name="text" translatable="yes">Clear Data</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">.646</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
