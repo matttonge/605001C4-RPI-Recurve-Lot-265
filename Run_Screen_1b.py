@@ -139,6 +139,8 @@ class RcPage1bApp:
         
 
         self.entry1_ = self.builder.get_object('entry1_')
+        self.labelframe1 = self.builder.get_object('labelframe1')
+        self.lot_dropdown_btn = self.builder.get_object('lot_dropdown_btn')
         self.bn_setup = self.builder.get_object('bn_setup')
         I_O.load_lot_number(self)
         # Stripping file extensions
@@ -242,7 +244,12 @@ class RcPage1bApp:
         self.entry1_.bind("<Return>", self.on_change)
         self.entry1_.bind("<KP_Enter>", self.on_change)
         self.entry1_.bind("<FocusOut>", self.on_change)
+        self.entry1_.bind("<<ComboboxSelected>>", self.on_change)
+        # Block ttk's default click-to-open list; only the ▼ button may post it.
+        self.entry1_.bind("<Button-1>", self._on_lot_combobox_press, add="+")
         self.entry1_.bind("<ButtonRelease-1>", self._on_lot_number_touch, add="+")
+        # Taps on the Lot Number frame chrome should also open the keypad.
+        self.labelframe1.bind("<ButtonRelease-1>", self._on_lot_number_touch, add="+")
         self.entry1_.set(DEFAULT_TREE_FILE_NAME)
         self.TreeFileName = DEFAULT_TREE_FILE_NAME
         
@@ -279,20 +286,74 @@ class RcPage1bApp:
     def _lot_keypad_class(self):
         return InlineAlphaKeypad if platform.system() == "Linux" else TouchAlphaKeypad
 
-    def _on_lot_number_touch(self, event):
-        # Leave the combobox dropdown arrow usable for picking existing lots.
+    def _on_lot_combobox_press(self, event):
+        """Focus the field but stop ttk from posting the dropdown on press."""
         try:
-            w = event.widget.winfo_width()
-            if w > 0 and event.x >= (w - 28):
-                return
-        except (tk.TclError, AttributeError):
+            self.entry1_.focus_set()
+        except tk.TclError:
+            pass
+        try:
+            self.balloonwindow.after_idle(self._unpost_lot_dropdown)
+        except tk.TclError:
+            self._unpost_lot_dropdown()
+        return "break"
+
+    def _unpost_lot_dropdown(self):
+        try:
+            self.entry1_.tk.call("ttk::combobox::Unpost", self.entry1_._w)
+        except tk.TclError:
             pass
 
+    def _on_lot_number_touch(self, event):
+        # Field / frame chrome opens the alphanumeric keypad; ▼ opens the list.
         now_ms = int(time.time() * 1000)
         if (now_ms - self._last_lot_keypad_open_ms) < 150:
             return
         self._last_lot_keypad_open_ms = now_ms
+        self._unpost_lot_dropdown()
         self.balloonwindow.after_idle(self._open_lot_keypad)
+
+    def callback_lot_dropdown(self):
+        """Open the lot-number combobox list from the large touch button."""
+        try:
+            if self._lot_keypad_win is not None and self._lot_keypad_win.winfo_exists():
+                self._lot_keypad_win.close_modal()
+                self._lot_keypad_win = None
+        except tk.TclError:
+            self._lot_keypad_win = None
+
+        # Prevent the field's ButtonRelease handler from opening the alpha keypad.
+        self._last_lot_keypad_open_ms = int(time.time() * 1000) + 500
+
+        try:
+            self.entry1_.focus_set()
+        except tk.TclError:
+            pass
+
+        def _post_list():
+            posted = False
+            try:
+                self.entry1_.tk.call("ttk::combobox::Post", self.entry1_._w)
+                posted = True
+            except tk.TclError:
+                pass
+            if posted:
+                return
+            try:
+                # Older/alternate Tk builds.
+                self.entry1_.event_generate("<Down>")
+                return
+            except tk.TclError:
+                pass
+            try:
+                self.entry1_.event_generate("<Alt-Down>")
+            except tk.TclError:
+                pass
+
+        try:
+            self.balloonwindow.after_idle(_post_list)
+        except tk.TclError:
+            _post_list()
 
     def _open_lot_keypad(self):
         if self._lot_keypad_var is None:
@@ -543,6 +604,7 @@ class RcPage1bApp:
             "prox_chuck_btn",
             "dist_clamp_btn",
             "prox_clamp_btn",
+            "lot_dropdown_btn",
         )
 
         def _reset_button(button):
@@ -585,8 +647,43 @@ class RcPage1bApp:
 
 
         style.configure("MyTView.Treeview.Heading",font=(None, 8), background="green2", foreground="black")
+        # Smaller "Lot Number" caption; larger touch-friendly combobox text.
+        style.configure("Lot.TLabelframe.Label", font=("Arial", 8))
+        style.configure("Lot.TLabelframe", padding=2)
+        style.configure("Lot.TCombobox", font=("Segoe UI", 14), padding=4)
+        # Hide the native combobox caret; the separate ▼ button opens the list.
+        self._apply_arrowless_combobox_style(style, "Lot.TCombobox")
+        try:
+            self.labelframe1.configure(style="Lot.TLabelframe")
+            self.entry1_.configure(style="Lot.TCombobox", font=("Segoe UI", 14))
+        except (tk.TclError, AttributeError):
+            pass
         #style.configure("Treeview.Heading", font=(None, 5))
         #load_data()
+
+    @staticmethod
+    def _apply_arrowless_combobox_style(style, style_name):
+        """Copy TCombobox layout but omit the built-in dropdown arrow element."""
+
+        def strip_arrows(nodes):
+            result = []
+            for item in nodes:
+                if not isinstance(item, tuple) or not item:
+                    continue
+                name = item[0]
+                opts = dict(item[1]) if len(item) > 1 and isinstance(item[1], dict) else {}
+                lowered = str(name).lower()
+                if "arrow" in lowered or "downarrow" in lowered:
+                    continue
+                if "children" in opts:
+                    opts["children"] = strip_arrows(opts["children"])
+                result.append((name, opts))
+            return result
+
+        try:
+            style.layout(style_name, strip_arrows(style.layout("TCombobox")))
+        except tk.TclError:
+            pass
 
 
     def btn_exit(self):
@@ -766,12 +863,13 @@ class RcPage1bApp:
             self.chuck_press_str.set(myStr)
 
     def set_cur_input_press(self, cur_press_psi):
-        if(self.cv.CurBalUnits=='psi'):
-            myStr = "{:3.1f} ".format(self.cv.to_cur_bal_units(cur_press_psi,'psi'))
+        # Input supply pressure is always shown in psi (never atm/bar).
+        if cur_press_psi is None:
+            myStr = ""
         else:
-            myStr = "{:2.2f} ".format(self.cv.to_cur_bal_units(cur_press_psi,'psi'))
+            myStr = "{:3.1f} ".format(float(cur_press_psi))
         if self.input_press_str.get()!=myStr:
-            self.input_press_frm.config(text="Input Pressure  "+self.cv.get_cur_bal_units())
+            self.input_press_frm.config(text="Input psi")
             self.input_press_str.set(myStr)
 
 

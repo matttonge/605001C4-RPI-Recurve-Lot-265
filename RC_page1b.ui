@@ -1,5 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
-<interface version="1.3">
+<interface version="1.5" author="PygubuDesigner 0.41.4">
+  <project>
+    <settings />
+    <customwidgets />
+    <resources />
+  </project>
   <object class="tk.Toplevel" id="SetupFrame" named="True">
     <property name="borderwidth">1</property>
     <property name="container">false</property>
@@ -32,7 +37,7 @@
             <layout manager="place">
               <property name="anchor">nw</property>
               <property name="relx">.012</property>
-              <property name="rely">.085</property>
+              <property name="rely">.095</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -263,9 +268,9 @@
             <property name="width">200</property>
             <layout manager="place">
               <property name="anchor">nw</property>
-              <property name="relheight">.075</property>
-              <property name="relwidth">.18</property>
-              <property name="relx">.015</property>
+              <property name="relheight">.09</property>
+              <property name="relwidth">.20</property>
+              <property name="relx">.014</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -274,12 +279,32 @@
                 <property name="textvariable">string:entry1_text</property>
                 <layout manager="place">
                   <property name="anchor">nw</property>
+                  <property name="relheight">.95</property>
                   <property name="relwidth">.97</property>
+                  <property name="relx">.015</property>
+                  <property name="rely">.02</property>
                   <property name="x">0</property>
                   <property name="y">0</property>
                 </layout>
               </object>
             </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="lot_dropdown_btn" named="True">
+            <property name="command" type="command" cbtype="simple">callback_lot_dropdown</property>
+            <property name="font">{Segoe UI} 22 bold</property>
+            <property name="takefocus">false</property>
+            <property name="text" translatable="yes">▼</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.080</property>
+              <property name="relwidth">.045</property>
+              <property name="relx">.219</property>
+              <property name="rely">.01</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
           </object>
         </child>
         <child>
@@ -349,7 +374,7 @@ Balloon</property>
               <property name="relheight">.122</property>
               <property name="relwidth">.975</property>
               <property name="relx">.5</property>
-              <property name="rely">0.853</property>
+              <property name="rely">0.85</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -364,7 +389,7 @@ Balloon</property>
             <layout manager="place">
               <property name="anchor">nw</property>
               <property name="relheight">.07</property>
-              <property name="relwidth">.06</property>
+              <property name="relwidth">.07</property>
               <property name="relx">.01</property>
               <property name="rely">.928</property>
               <property name="x">0</property>
@@ -381,7 +406,7 @@ Balloon</property>
               <property name="anchor">nw</property>
               <property name="relheight">.07</property>
               <property name="relwidth">.07</property>
-              <property name="relx">0.074</property>
+              <property name="relx">0.084</property>
               <property name="rely">.928</property>
               <property name="x">0</property>
               <property name="y">0</property>
@@ -397,7 +422,7 @@ Balloon</property>
               <property name="anchor">nw</property>
               <property name="relheight">.07</property>
               <property name="relwidth">.07</property>
-              <property name="relx">.5</property>
+              <property name="relx">.499</property>
               <property name="rely">.928</property>
               <property name="x">0</property>
               <property name="y">0</property>
@@ -413,8 +438,8 @@ Target</property>
             <layout manager="place">
               <property name="anchor">nw</property>
               <property name="relheight">.07</property>
-              <property name="relwidth">.10</property>
-              <property name="relx">.17</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">.198</property>
               <property name="rely">.928</property>
               <property name="x">0</property>
               <property name="y">0</property>
@@ -430,8 +455,8 @@ Target</property>
             <layout manager="place">
               <property name="anchor">nw</property>
               <property name="relheight">.07</property>
-              <property name="relwidth">.10</property>
-              <property name="relx">.285</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">.272</property>
               <property name="rely">.928</property>
               <property name="x">0</property>
               <property name="y">0</property>
@@ -447,10 +472,10 @@ Target</property>
 Chuck</property>
             <layout manager="place">
               <property name="anchor">nw</property>
-              <property name="relheight">.07</property>
-              <property name="relwidth">.062</property>
-              <property name="relx">0.733</property>
-              <property name="rely">.005</property>
+              <property name="relheight">.080</property>
+              <property name="relwidth">.05</property>
+              <property name="relx">0.775</property>
+              <property name="rely">.01</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -460,12 +485,12 @@ Chuck</property>
           <object class="tk.LabelFrame" id="input_press_frm" named="True">
             <property name="font">{arial} 8 {}</property>
             <property name="highlightbackground">#c0c0c0</property>
-            <property name="text" translatable="yes">Input Pressure atm</property>
+            <property name="text" translatable="yes">Input psi</property>
             <layout manager="place">
               <property name="anchor">nw</property>
-              <property name="relheight">.075</property>
-              <property name="relwidth">.134</property>
-              <property name="relx">.346</property>
+              <property name="relheight">.09</property>
+              <property name="relwidth">.08</property>
+              <property name="relx">.691</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -478,7 +503,7 @@ Chuck</property>
                 <layout manager="place">
                   <property name="anchor">center</property>
                   <property name="relheight">1.0</property>
-                  <property name="relx">.735</property>
+                  <property name="relx">.45</property>
                   <property name="rely">0.4</property>
                   <property name="x">0</property>
                   <property name="y">0</property>
@@ -494,9 +519,9 @@ Chuck</property>
             <property name="text" translatable="yes">Chuck Pressure atm</property>
             <layout manager="place">
               <property name="anchor">nw</property>
-              <property name="relheight">.075</property>
-              <property name="relwidth">.134</property>
-              <property name="relx">.488</property>
+              <property name="relheight">.09</property>
+              <property name="relwidth">.114</property>
+              <property name="relx">.5</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -524,8 +549,8 @@ Chuck</property>
                 <layout manager="place">
                   <property name="anchor">se</property>
                   <property name="relheight">.7</property>
-                  <property name="relwidth">.4</property>
-                  <property name="relx">.46</property>
+                  <property name="relwidth">.38</property>
+                  <property name="relx">.42</property>
                   <property name="rely">.8</property>
                   <property name="x">0</property>
                   <property name="y">0</property>
@@ -541,9 +566,9 @@ Chuck</property>
             <property name="text" translatable="yes"> Position  mm</property>
             <layout manager="place">
               <property name="anchor">nw</property>
-              <property name="relheight">.075</property>
-              <property name="relwidth">.090</property>
-              <property name="relx">.633</property>
+              <property name="relheight">.09</property>
+              <property name="relwidth">.076</property>
+              <property name="relx">.614</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -572,9 +597,9 @@ Chuck</property>
             <property name="text" translatable="yes">Balloon Pressure atm</property>
             <layout manager="place">
               <property name="anchor">nw</property>
-              <property name="relheight">.075</property>
-              <property name="relwidth">.135</property>
-              <property name="relx">.204</property>
+              <property name="relheight">.09</property>
+              <property name="relwidth">.113</property>
+              <property name="relx">.269</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -603,8 +628,8 @@ Chuck</property>
                 <layout manager="place">
                   <property name="anchor">se</property>
                   <property name="relheight">.7</property>
-                  <property name="relwidth">.4</property>
-                  <property name="relx">.46</property>
+                  <property name="relwidth">.38</property>
+                  <property name="relx">.42</property>
                   <property name="rely">.8</property>
                   <property name="x">0</property>
                   <property name="y">0</property>
@@ -620,9 +645,9 @@ Chuck</property>
             <property name="text" translatable="yes">Diameter  mm  (in)</property>
             <layout manager="place">
               <property name="anchor">nw</property>
-              <property name="relheight">.075</property>
-              <property name="relwidth">.134</property>
-              <property name="relx">.346</property>
+              <property name="relheight">.09</property>
+              <property name="relwidth">.118</property>
+              <property name="relx">.382</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -671,10 +696,10 @@ Chuck</property>
 Chuck</property>
             <layout manager="place">
               <property name="anchor">nw</property>
-              <property name="relheight">.07</property>
-              <property name="relwidth">.062</property>
-              <property name="relx">0.798</property>
-              <property name="rely">.005</property>
+              <property name="relheight">.08</property>
+              <property name="relwidth">0.05</property>
+              <property name="relx">0.83</property>
+              <property name="rely">.01</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -689,10 +714,10 @@ Chuck</property>
 Clamp</property>
             <layout manager="place">
               <property name="anchor">nw</property>
-              <property name="relheight">.07</property>
-              <property name="relwidth">.062</property>
-              <property name="relx">0.863</property>
-              <property name="rely">.005</property>
+              <property name="relheight">.08</property>
+              <property name="relwidth">.05</property>
+              <property name="relx">0.885</property>
+              <property name="rely">.01</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -707,10 +732,10 @@ Clamp</property>
 Clamp</property>
             <layout manager="place">
               <property name="anchor">nw</property>
-              <property name="relheight">.07</property>
-              <property name="relwidth">.062</property>
-              <property name="relx">0.928</property>
-              <property name="rely">.005</property>
+              <property name="relheight">.08</property>
+              <property name="relwidth">.05</property>
+              <property name="relx">0.94</property>
+              <property name="rely">.01</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
@@ -724,7 +749,7 @@ Clamp</property>
               <property name="anchor">center</property>
               <property name="relwidth">.975</property>
               <property name="relx">.5</property>
-              <property name="rely">.615</property>
+              <property name="rely">.61</property>
               <property name="x">0</property>
               <property name="y">0</property>
             </layout>
