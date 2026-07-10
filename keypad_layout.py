@@ -340,6 +340,92 @@ def create_keypad_preview_entry(parent, string_var):
     return entry
 
 
+def create_alpha_keypad_preview_entry(parent, string_var):
+    """Editable preview field for alphanumeric keypad (wider for lot names)."""
+    entry = tk.Entry(
+        parent,
+        textvariable=string_var,
+        font=("Segoe UI", 20),
+        justify=tk.CENTER,
+        relief=tk.SUNKEN,
+        width=18,
+        exportselection=False,
+    )
+    try:
+        entry.configure(takefocus=1)
+    except tk.TclError:
+        pass
+    entry._keypad_preview = True
+    return entry
+
+
+def _make_alpha_keypad_key_handler(append_fn, backspace_fn, clear_fn, exit_fn):
+    def on_key(event):
+        keysym = event.keysym
+        if keysym in ("Return", "KP_Enter"):
+            exit_fn()
+            return "break"
+        if keysym == "Escape":
+            exit_fn()
+            return "break"
+        if keysym == "BackSpace":
+            backspace_fn()
+            return "break"
+        if keysym == "Delete":
+            clear_fn()
+            return "break"
+        if keysym in ("Shift_L", "Shift_R", "Control_L", "Control_R", "Alt_L", "Alt_R", "Caps_Lock"):
+            return None
+        if keysym in ("Left", "Right", "Home", "End", "Tab"):
+            return None
+        if keysym.startswith("KP_") and keysym[3:].isdigit():
+            append_fn(keysym[3:])
+            return "break"
+        ch = event.char
+        if ch and len(ch) == 1 and ch.isprintable() and not ch.isspace():
+            append_fn(ch)
+            return "break"
+        return "break"
+
+    return on_key
+
+
+def install_alpha_keypad_keyboard(widget, append_fn, backspace_fn, clear_fn, exit_fn):
+    """Bind USB keyboard for alphanumeric keypad preview entry."""
+    global _active_keypad_binding, _active_keypad_window
+    remove_keypad_keyboard()
+
+    handler = _make_alpha_keypad_key_handler(append_fn, backspace_fn, clear_fn, exit_fn)
+    bindings = []
+    for w in _keypad_bind_targets(widget):
+        for seq in ("<KeyPress>", "<Key>"):
+            funcid = w.bind(seq, handler, add="+")
+            bindings.append(("widget", w, seq, funcid))
+
+    if sys.platform.startswith("linux"):
+        root = widget._root()
+        for seq in ("<KeyPress>", "<Key>"):
+            funcid = root.bind_all(seq, handler, add="+")
+            bindings.append(("all", root, seq, funcid))
+
+    _active_keypad_binding = bindings
+    _active_keypad_window = widget.winfo_toplevel()
+    _linux_keypad_enter(_active_keypad_window)
+
+    top = _active_keypad_window
+    try:
+        top.focus_force()
+    except tk.TclError:
+        pass
+    if getattr(widget, "_keypad_preview", False):
+        focus_keypad_preview(widget)
+        try:
+            widget.tk.call("focus", widget._w)
+        except tk.TclError:
+            pass
+    return handler
+
+
 def bind_keypad_preview_entry(entry, exit_fn):
     """Allow digits in the preview entry; Enter/Escape commit/close."""
 

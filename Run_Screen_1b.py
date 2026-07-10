@@ -18,7 +18,6 @@ from app_config import (
     MODE_MANUAL,
 )
 from serial_transfer import COM_DATA
-from keyboardlib import VirtualKeyboard
 from conversions import CONVERSIONS
 from run_manual import rs_manual, Parameter
 from run_auto import rs_auto
@@ -27,6 +26,8 @@ from screen_2_app import RcSetupPage2App
 from io_ import I_O,json_cls
 from touch_numeric_keypad import TouchNumericKeypad
 from inline_numeric_keypad import InlineNumericKeypad
+from touch_alpha_keypad import TouchAlphaKeypad
+from inline_alpha_keypad import InlineAlphaKeypad
 from keypad_layout import (
     configure_linux_kiosk_window,
     install_linux_keyboard_field,
@@ -79,6 +80,9 @@ class RcPage1bApp:
         self._target_keypad_win = None
         self._target_keypad_var = None
         self._target_keypad_apply = None
+        self._lot_keypad_win = None
+        self._lot_keypad_var = None
+        self._last_lot_keypad_open_ms = 0
         self._keypad_parent = None
      
         #self.cd = COM_DATA(self)
@@ -238,6 +242,7 @@ class RcPage1bApp:
         self.entry1_.bind("<Return>", self.on_change)
         self.entry1_.bind("<KP_Enter>", self.on_change)
         self.entry1_.bind("<FocusOut>", self.on_change)
+        self.entry1_.bind("<ButtonRelease-1>", self._on_lot_number_touch, add="+")
         self.entry1_.set(DEFAULT_TREE_FILE_NAME)
         self.TreeFileName = DEFAULT_TREE_FILE_NAME
         
@@ -257,7 +262,97 @@ class RcPage1bApp:
     def on_change(self,event):
         if(self.entry1_.get() != self.TreeFileName):
             self.TreeFileName=self.entry1_.get()
-            I_O.load_xl_files(self,self.TreeFileName, self.tree)
+            self._load_lot_into_tree(self.TreeFileName)
+
+    def _load_lot_into_tree(self, lot_number):
+        """Load an existing lot workbook, or clear the tree for a new lot name."""
+        lot_number = (lot_number or "").strip()
+        if not lot_number:
+            return
+        file_path = I_O.path_1 + lot_number + ".xlsx"
+        if os.path.exists(file_path):
+            I_O.load_xl_files(self, lot_number, self.tree)
+            return
+        self.clear_treeview(self.tree)
+        self.setup_tree()
+
+    def _lot_keypad_class(self):
+        return InlineAlphaKeypad if platform.system() == "Linux" else TouchAlphaKeypad
+
+    def _on_lot_number_touch(self, event):
+        # Leave the combobox dropdown arrow usable for picking existing lots.
+        try:
+            w = event.widget.winfo_width()
+            if w > 0 and event.x >= (w - 28):
+                return
+        except (tk.TclError, AttributeError):
+            pass
+
+        now_ms = int(time.time() * 1000)
+        if (now_ms - self._last_lot_keypad_open_ms) < 150:
+            return
+        self._last_lot_keypad_open_ms = now_ms
+        self.balloonwindow.after_idle(self._open_lot_keypad)
+
+    def _open_lot_keypad(self):
+        if self._lot_keypad_var is None:
+            self._lot_keypad_var = tk.StringVar(self.master)
+
+        # Close pressure keypad if it is open so only one overlay is active.
+        if self._target_keypad_win is not None:
+            try:
+                if self._target_keypad_win.winfo_exists():
+                    self._target_keypad_win.close_modal()
+            except tk.TclError:
+                pass
+            self._target_keypad_win = None
+
+        initial = (self.entry1_.get() or "").strip()
+        title = "Enter Lot Number"
+
+        def on_exit():
+            self._apply_lot_from_keypad()
+            self._lot_keypad_win = None
+
+        if self._lot_keypad_win is not None:
+            try:
+                if self._lot_keypad_win.winfo_exists():
+                    self._lot_keypad_win.set_target(
+                        self._lot_keypad_var,
+                        on_exit=on_exit,
+                        side=None,
+                        title=title,
+                        initial=initial,
+                    )
+                    self._lot_keypad_win.lift()
+                    return
+            except tk.TclError:
+                pass
+            self._lot_keypad_win = None
+
+        keypad_cls = self._lot_keypad_class()
+        self._lot_keypad_win = keypad_cls(
+            self._keypad_parent,
+            self._lot_keypad_var,
+            on_exit=on_exit,
+            side=None,
+            title=title,
+            initial=initial,
+        )
+
+    def _apply_lot_from_keypad(self):
+        if self._lot_keypad_var is None:
+            return
+        lot = (self._lot_keypad_var.get() or "").strip()
+        if not lot:
+            return
+        self.entry1_.set(lot)
+        if lot != self.TreeFileName:
+            self.TreeFileName = lot
+            self._load_lot_into_tree(lot)
+
+    def callback_lot_number_bp(self, event=None):
+        self._open_lot_keypad()
 
 
     def clear_treeview(self,tree):
@@ -550,6 +645,14 @@ class RcPage1bApp:
         if self._target_keypad_var is None:
             self._target_keypad_var = tk.StringVar(self.master)
 
+        if self._lot_keypad_win is not None:
+            try:
+                if self._lot_keypad_win.winfo_exists():
+                    self._lot_keypad_win.close_modal()
+            except tk.TclError:
+                pass
+            self._lot_keypad_win = None
+
         if target_kind == "balloon":
             apply_fn = self._apply_balloon_target_from_keypad
         else:
@@ -806,11 +909,6 @@ class RcPage1bApp:
             param.obj.config(background = "white", text = param.name)
 
 
-
-    def callback_lot_number_bp(self, event=None):
-       # entry = self.builder.get_object('entry1', self.master)
-       # VirtualKeyboard(entry)
-       pass 
 
     def file_name_cb(self, event=None):
         pass
