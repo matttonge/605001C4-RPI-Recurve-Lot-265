@@ -7,6 +7,8 @@ from conversions import CONVERSIONS
 import time
 import datetime
 import openpyxl 
+from openpyxl.styles import Alignment
+from openpyxl.utils import get_column_letter
 import json
 import platform 
 import os
@@ -80,7 +82,6 @@ class I_O:
         for column in self.tree["columns"]:
             header_text.append(self.tree.heading(column)["text"])
         sheet.append(header_text)   
-        row_lists = []
         for child_item in self.tree.get_children():
             row_values = list(self.tree.item(child_item)["values"])
             i=0
@@ -90,7 +91,10 @@ class I_O:
                 except:
                     row_values[i] =""
                 i+=1
-            sheet.append(row_values)   
+            sheet.append(row_values)
+
+        I_O._format_lot_worksheet(sheet)
+
         if lot_num == "":
             fname= 'Temp_'+ datetime.datetime.now().strftime("%Y-%m-%d_%H_%M")
             workbook.save(I_O.path_1+fname+".xlsx")
@@ -106,6 +110,38 @@ class I_O:
                 os.rename(file_path, tmp_file_path)        
             workbook.save(file_path)
         I_O.load_lot_number(self)
+
+    @staticmethod
+    def _format_lot_worksheet(sheet):
+        """Center cell contents and size columns to fit header/data text."""
+        if sheet.max_row < 1 or sheet.max_column < 1:
+            return
+
+        center = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        for row in sheet.iter_rows(
+            min_row=1,
+            max_row=sheet.max_row,
+            min_col=1,
+            max_col=sheet.max_column,
+        ):
+            for cell in row:
+                cell.alignment = center
+
+        # Size each used column from the widest header or data string in that column.
+        for col_idx in range(1, sheet.max_column + 1):
+            max_len = 0
+            for row_idx in range(1, sheet.max_row + 1):
+                value = sheet.cell(row=row_idx, column=col_idx).value
+                if value is None:
+                    continue
+                max_len = max(max_len, len(str(value)))
+            # openpyxl width is approximate character units; pad slightly for readability.
+            sheet.column_dimensions[get_column_letter(col_idx)].width = max(max_len + 2, 6)
+
+        # Give the header row a bit more height when labels wrap.
+        sheet.row_dimensions[1].height = 30
+        for row_idx in range(2, sheet.max_row + 1):
+            sheet.row_dimensions[row_idx].height = 18
            
 
 
