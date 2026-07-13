@@ -434,6 +434,9 @@ class RcSetupPage2App:
             self.cb_prox_left.select()
         else: 
             self.cb_prox_left.deselect()
+        # Keep Screen 1 Excel headers, diagram labels, and message orientation in sync.
+        if hasattr(self.parent, "apply_cone_orientation"):
+            self.parent.apply_cone_orientation(preserve_rows=True)
 
     def btn_exit(self):
         self.parent.bal_btn_bg()

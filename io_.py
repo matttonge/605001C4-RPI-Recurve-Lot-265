@@ -15,7 +15,8 @@ PROJECT_PATH = pathlib.Path(__file__).parent
 
 class I_O:
     
-    cone_flip = True
+    # False = Prox Left unchecked (distal-first Excel/tree headers).
+    cone_flip = False
     Software_Model_Rev = APP_SOFTWARE_MODEL_REV
      
     if (platform.system()=="Windows"): 
@@ -26,16 +27,21 @@ class I_O:
 
     def __init__(self, parent):
         self.parent = parent
-       
+
+    @staticmethod
+    def cone_flip_from_excel_headers(header_row):
+        """Infer Prox Left from Excel header row (column 2 / index 1)."""
+        if not header_row or len(header_row) < 2:
+            return False
+        col1 = str(header_row[1] or "").strip().lower()
+        return col1.startswith("prox")
 
     def load_xl_files(self,lot_number, treeview):
         workbook = openpyxl.load_workbook(I_O.path_1+lot_number+".xlsx")
         sheet= workbook.active
         list_values = list(sheet.values)
-        lk=list_values[0]
-        if(lk[1] =='Prox. OD (inch)'):
-           I_O.cone_flip = 1
-        else: I_O.cone_flip = 0
+        lk=list_values[0] if list_values else ()
+        I_O.cone_flip = bool(I_O.cone_flip_from_excel_headers(lk))
         self.clear_treeview(treeview)
        # for col_name in list_values[0]:
        #     treeview.heading(col_name, text=col_name)
@@ -44,6 +50,11 @@ class I_O:
                 treeview.delete(item)            
         for value_tuple in list_values[1:]:
             treeview.insert('', tk.END, values=value_tuple)
+        # Keep diagram / instruction labels aligned with the loaded lot orientation.
+        if hasattr(self, "setup_pic_Labels"):
+            self.setup_pic_Labels()
+            if hasattr(self, "clear_params"):
+                self.clear_params()
 
        
        
@@ -59,7 +70,10 @@ class I_O:
 
 
     def write_xl_file(self, lot_num):
-        
+        # Persist current Prox Left orientation in the Excel header row.
+        if hasattr(self, "setup_tree"):
+            self.setup_tree()
+
         workbook = openpyxl.Workbook()
         sheet= workbook.active
         header_text=[]
@@ -68,7 +82,7 @@ class I_O:
         sheet.append(header_text)   
         row_lists = []
         for child_item in self.tree.get_children():
-            row_values = self.tree.item(child_item)["values"]
+            row_values = list(self.tree.item(child_item)["values"])
             i=0
             for value in row_values:
                 try: 
@@ -133,6 +147,6 @@ class json_cls:
         """
         with open(str(PROJECT_PATH / STARTUP_JSON_NAME), 'r') as f:
             data = json.load(f)
-            I_O.cone_flip = data['cone_flip']
+            I_O.cone_flip = bool(data.get('cone_flip', False))
         return data
 

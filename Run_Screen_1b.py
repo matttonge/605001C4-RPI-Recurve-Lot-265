@@ -275,13 +275,37 @@ class RcPage1bApp:
         """Load an existing lot workbook, or clear the tree for a new lot name."""
         lot_number = (lot_number or "").strip()
         if not lot_number:
+            I_O.cone_flip = False
+            self.apply_cone_orientation(preserve_rows=False)
             return
         file_path = I_O.path_1 + lot_number + ".xlsx"
         if os.path.exists(file_path):
             I_O.load_xl_files(self, lot_number, self.tree)
             return
-        self.clear_treeview(self.tree)
+        # New lot / missing file: Prox Left unchecked.
+        I_O.cone_flip = False
+        self.apply_cone_orientation(preserve_rows=False)
+
+    def apply_cone_orientation(self, preserve_rows=True):
+        """Refresh tree headers and diagram labels from I_O.cone_flip."""
+        rows = []
+        if preserve_rows:
+            try:
+                for iid in self.tree.get_children():
+                    rows.append(self.tree.item(iid)["values"])
+            except tk.TclError:
+                rows = []
+        try:
+            for iid in self.tree.get_children():
+                self.tree.delete(iid)
+            self.tree.configure(columns=())
+        except tk.TclError:
+            pass
         self.setup_tree()
+        for values in rows:
+            self.tree.insert("", tk.END, values=values)
+        self.setup_pic_Labels()
+        self.clear_params()
 
     def _lot_keypad_class(self):
         return InlineAlphaKeypad if platform.system() == "Linux" else TouchAlphaKeypad
@@ -500,6 +524,8 @@ class RcPage1bApp:
         COM_DATA.right_clamp = 1
 
     def callback_save_data(self):
+        # Write Excel headers that match the current Prox Left checkbox state.
+        self.setup_tree()
         I_O.write_xl_file(self , self.entry1_.get())
     
     def callback_clear_data(self):
