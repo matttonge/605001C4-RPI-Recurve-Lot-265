@@ -13,6 +13,7 @@ from io_ import I_O,json_cls
 from touch_numeric_keypad import TouchNumericKeypad
 from inline_numeric_keypad import InlineNumericKeypad
 from keypad_layout import configure_linux_kiosk_window, prime_linux_kiosk_keyboard, release_linux_keyboard_field
+from bass320_transfer import last_tree_row_values
 
 
 PROJECT_PATH = pathlib.Path(__file__).parent
@@ -73,6 +74,8 @@ class RcSetupPage2App:
         self.clamp_ref_press_str = None
         self.v_clamp_cal_rb = None
         self.prox_left = 0
+        self.usb_transfer_enabled = None
+        self.usb_status_str = None
         self._suppress_pressure_entry_focusout = False
         self._numeric_keypad_win = None
         self._active_keypad_var = None
@@ -112,7 +115,9 @@ class RcSetupPage2App:
                                   'clamp_cal_checked',
                                   'v_clamp_ref_sldr',
                                   'clamp_ref_press_str',
-                                  'v_clamp_cal_rb'])
+                                  'v_clamp_cal_rb',
+                                  'usb_transfer_enabled',
+                                  'usb_status_str'])
 
 
         self.v_bal_units = self.builder.get_variable('v_bal_units')
@@ -147,6 +152,7 @@ class RcSetupPage2App:
         self.bal_cal_ref_entry = self.builder.get_object('bal_cal_ref_press_str')
         self.clamp_cal_ref_entry = self.builder.get_object('clamp_cal_ref_press_str')
         self.cb_prox_left = self.builder.get_object('cb_prox_left')
+        self.usb_connect_btn = self.builder.get_object('usb_connect_btn')
          
         self.msg_box = self.builder.get_object('msg_box_tx')
          
@@ -201,10 +207,75 @@ class RcSetupPage2App:
         else: 
             self.cb_prox_left.deselect()
 
+        self._init_usb_transfer_controls()
+
       #  self.cd = my_cd #COM_DATA(self)
         
     def run(self): 
         self.mainwindow.mainloop()
+
+    def _init_usb_transfer_controls(self):
+        enabled = bool(getattr(self.parent, "usb_transfer_enabled", False))
+        self.usb_transfer_enabled.set(1 if enabled else 0)
+        self._refresh_usb_transfer_ui()
+        # Poll status while Setup is open (server updates from another thread).
+        self._schedule_usb_status_poll()
+
+    def _schedule_usb_status_poll(self):
+        try:
+            if not self.mainwindow.winfo_exists():
+                return
+        except tk.TclError:
+            return
+        self._refresh_usb_transfer_ui()
+        try:
+            self.mainwindow.after(500, self._schedule_usb_status_poll)
+        except tk.TclError:
+            pass
+
+    def _usb_display_status(self):
+        if not getattr(self.parent, "usb_transfer_enabled", False):
+            return "USB off"
+        if not getattr(self.parent, "usb_transfer_connected", False):
+            return "USB off"
+        status = "Waiting"
+        if hasattr(self.parent, "get_usb_status_text"):
+            status = self.parent.get_usb_status_text()
+        if status == "Connected":
+            tree = getattr(self.parent, "tree", None)
+            if tree is not None and last_tree_row_values(tree) is None:
+                return "No data"
+        return status
+
+    def _refresh_usb_transfer_ui(self):
+        enabled = bool(getattr(self.parent, "usb_transfer_enabled", False))
+        connected = bool(getattr(self.parent, "usb_transfer_connected", False))
+        try:
+            self.usb_connect_btn.configure(
+                text="Disconnect" if (enabled and connected) else "Connect",
+                state=("normal" if enabled else "disabled"),
+            )
+        except tk.TclError:
+            pass
+        try:
+            self.usb_status_str.set(self._usb_display_status())
+        except Exception:
+            pass
+
+    def callback_usb_transfer_enable(self):
+        enabled = bool(self.usb_transfer_enabled.get())
+        if hasattr(self.parent, "set_usb_transfer_enabled"):
+            self.parent.set_usb_transfer_enabled(enabled)
+        self._refresh_usb_transfer_ui()
+
+    def callback_usb_connect_toggle(self):
+        if not getattr(self.parent, "usb_transfer_enabled", False):
+            self._refresh_usb_transfer_ui()
+            return
+        connected = not bool(getattr(self.parent, "usb_transfer_connected", False))
+        if hasattr(self.parent, "set_usb_transfer_connected"):
+            self.parent.set_usb_transfer_connected(connected)
+        self._refresh_usb_transfer_ui()
 
     def setup_ttk_styles(self):
         self.style = style = ttk.Style()      
@@ -442,8 +513,17 @@ class RcSetupPage2App:
         self.parent.bal_btn_bg()
         self.parent.chuck_btn_bg()
         self.cd.set_master(self.parent)
-        self.parent.j.write_to_json(COM_DATA.target_balloon_pressure, COM_DATA.target_chuck_pressure, self.parent.cv.CurBalUnits,
-                                    self.parent.cv.CurClampUnits, self.parent.cv.CurDiaUnits, self.parent.cv.CurPosUnits,self.parent.TreeFileName)
+        self.parent.j.write_to_json(
+            COM_DATA.target_balloon_pressure,
+            COM_DATA.target_chuck_pressure,
+            self.parent.cv.CurBalUnits,
+            self.parent.cv.CurClampUnits,
+            self.parent.cv.CurDiaUnits,
+            self.parent.cv.CurPosUnits,
+            self.parent.TreeFileName,
+            usb_transfer_enabled=getattr(self.parent, "usb_transfer_enabled", False),
+            usb_transfer_connected=getattr(self.parent, "usb_transfer_connected", False),
+        )
         self.parent.callback_clear_data()
         self._close_numeric_keypad()
         self.mainwindow.destroy()

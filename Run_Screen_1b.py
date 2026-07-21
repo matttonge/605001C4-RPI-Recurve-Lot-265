@@ -16,6 +16,8 @@ from app_config import (
     MODE_LOAD,
     MODE_AUTO,
     MODE_MANUAL,
+    USB_TRANSFER_CONNECTED_DEFAULT,
+    USB_TRANSFER_ENABLED_DEFAULT,
 )
 from serial_transfer import COM_DATA
 from conversions import CONVERSIONS
@@ -24,6 +26,7 @@ from run_auto import rs_auto
 
 from screen_2_app import RcSetupPage2App
 from io_ import I_O,json_cls
+from usb_com_transfer import UsbComTransferServer
 from touch_numeric_keypad import TouchNumericKeypad
 from inline_numeric_keypad import InlineNumericKeypad
 from touch_alpha_keypad import TouchAlphaKeypad
@@ -228,7 +231,23 @@ class RcPage1bApp:
         self.cv.CurClampUnits=read_data['cur_clamp_units']
         self.cv.CurDiaUnits=read_data['cur_dia_units']
         self.cv.CurPosUnits=read_data['cur_pos_units']
-        self.TreeFileName = read_data['tree_file_name']   
+        self.TreeFileName = read_data['tree_file_name']
+        self.usb_transfer_enabled = bool(
+            read_data.get("usb_transfer_enabled", USB_TRANSFER_ENABLED_DEFAULT)
+        )
+        self.usb_transfer_connected = bool(
+            read_data.get("usb_transfer_connected", USB_TRANSFER_CONNECTED_DEFAULT)
+        )
+        self.usb_status_text = "USB off"
+        self._usb_server = UsbComTransferServer(
+            tree_provider=lambda: self.tree,
+            cone_flip_provider=lambda: I_O.cone_flip,
+            status_callback=self._on_usb_status,
+        )
+        if self.usb_transfer_enabled and self.usb_transfer_connected:
+            self._usb_server.start()
+        else:
+            self.usb_status_text = "USB off"
 
         self.entry1_.configure(state="normal")
         try:
@@ -527,7 +546,96 @@ class RcPage1bApp:
         # Write Excel headers that match the current Prox Left checkbox state.
         self.setup_tree()
         I_O.write_xl_file(self , self.entry1_.get())
-    
+
+    def _on_usb_status(self, status):
+        self.usb_status_text = status
+        # Marshal UI updates onto the Tk thread when possible.
+        try:
+            self.balloonwindow.after(0, lambda s=status: self._apply_usb_status_ui(s))
+        except Exception:
+            pass
+
+    def _apply_usb_status_ui(self, status):
+        self.usb_status_text = status
+
+    def persist_usb_transfer_state(self):
+        self.j.write_to_json(
+            COM_DATA.target_balloon_pressure,
+            COM_DATA.target_chuck_pressure,
+            self.cv.CurBalUnits,
+            self.cv.CurClampUnits,
+            self.cv.CurDiaUnits,
+            self.cv.CurPosUnits,
+            self.TreeFileName,
+            usb_transfer_enabled=self.usb_transfer_enabled,
+            usb_transfer_connected=self.usb_transfer_connected,
+        )
+
+    def set_usb_transfer_enabled(self, enabled):
+        self.usb_transfer_enabled = bool(enabled)
+        if not self.usb_transfer_enabled:
+            self.usb_transfer_connected = False
+            self._usb_server.stop()
+            self.usb_status_text = "USB off"
+        elif self.usb_transfer_connected:
+            self._usb_server.start()
+        else:
+            self.usb_status_text = "USB off"
+        self.persist_usb_transfer_state()
+
+    def set_usb_transfer_connected(self, connected):
+        if not self.usb_transfer_enabled:
+            self.usb_transfer_connected = False
+            self._usb_server.stop()
+            self.usb_status_text = "USB off"
+            self.persist_usb_transfer_state()
+            return
+        self.usb_transfer_connected = bool(connected)
+        if self.usb_transfer_connected:
+            self._usb_server.start()
+        else:
+            self._usb_server.stop()
+            self.usb_status_text = "USB off"
+        self.persist_usb_transfer_state()
+
+    def get_usb_status_text(self):
+        if not self.usb_transfer_enabled:
+            return "USB off"
+        if not self.usb_transfer_connected:
+            return "USB off"
+        return self.usb_status_text or self._usb_server.last_status or "Waiting"
+
+    def callback_transfer(self):
+        """Show USB COM connection status. Excel VBA pulls the last row."""
+        status = self.get_usb_status_text()
+        if not self.usb_transfer_enabled or not self.usb_transfer_connected:
+            status = "USB off"
+        elif status == "Connected":
+            children = self.tree.get_children()
+            if not children:
+                status = "No data"
+        self._flash_status_message(status)
+
+    def _flash_status_message(self, text, clear_ms=1800):
+        try:
+            self.message_txt.delete(1.0, "end")
+            self.message_txt.insert(1.0, " " + str(text) + "\n")
+        except tk.TclError:
+            return
+
+        def _clear():
+            try:
+                current = self.message_txt.get(1.0, "1.end").strip()
+                if current == str(text).strip():
+                    self.message_txt.delete(1.0, "end")
+            except tk.TclError:
+                pass
+
+        try:
+            self.balloonwindow.after(clear_ms, _clear)
+        except tk.TclError:
+            pass
+
     def callback_clear_data(self):
         # Clearing all the rows
         for item in self.tree.get_children():
@@ -621,6 +729,7 @@ class RcPage1bApp:
             "Manual_btn",
             "bn_exit",
             "bn_setup",
+            "transfer_btn",
             "get_data_btn",
             "set_bal_target_btn",
             "set_chuck_target_btn",
@@ -713,7 +822,15 @@ class RcPage1bApp:
 
 
     def btn_exit(self):
-        self.cd.deinit() 
+        try:
+            self.persist_usb_transfer_state()
+        except Exception:
+            pass
+        try:
+            self._usb_server.stop()
+        except Exception:
+            pass
+        self.cd.deinit()
         self.master.destroy()
     # self.balloonwindow.destroy()        
         

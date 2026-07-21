@@ -6,5 +6,7 @@
     "cur_dia_units": "mm",
     "cur_pos_units": "mm",
     "cone_flip": 1,
-    "tree_file_name": "Test"
+    "tree_file_name": "Test",
+    "usb_transfer_enabled": false,
+    "usb_transfer_connected": false
 }

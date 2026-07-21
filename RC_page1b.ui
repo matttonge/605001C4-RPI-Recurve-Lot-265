@@ -414,6 +414,23 @@ Balloon</property>
           </object>
         </child>
         <child>
+          <object class="tk.Button" id="transfer_btn" named="True">
+            <property name="command" type="command" cbtype="simple">callback_transfer</property>
+            <property name="font">{arial} 9 {}</property>
+            <property name="justify">center</property>
+            <property name="text" translatable="yes">Transfer</property>
+            <layout manager="place">
+              <property name="anchor">nw</property>
+              <property name="relheight">.07</property>
+              <property name="relwidth">.07</property>
+              <property name="relx">.425</property>
+              <property name="rely">.928</property>
+              <property name="x">0</property>
+              <property name="y">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
           <object class="tk.Button" id="get_data_btn" named="True">
             <property name="command" type="command" cbtype="simple">callback_get_data</property>
             <property name="font">{arial} 9 {}</property>
