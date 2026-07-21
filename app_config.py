@@ -32,6 +32,10 @@ USB_TRANSFER_CONNECTED_DEFAULT = False
 # Deprecated: Bluetooth HID keyboard emulator was previously used to type into Excel.
 # Do not enable for normal product boot — it conflicts with physical BT keyboards.
 BT_HID_TRANSFER_DEPRECATED = True
+BT_HID_ENABLED = False
+BT_HID_DEVICE_NAME = "Recurve-Transfer"
+BT_HID_HCI = 0
+BT_HID_KEY_DELAY_SEC = 0.003
 
 MODE_LOAD = 0
 MODE_AUTO = 1
