@@ -9,7 +9,7 @@ Attribute VB_Name = "RecurveUsbTransfer"
 ' USB GetFromRecurve remains in this module for future hardware but the
 ' Excel USB button is hidden for the demo.
 '
-' Wi-Fi IP: active sheet cell AB1 (e.g. 192.168.1.186)
+' Wi-Fi IP: active sheet cell AB1 (e.g. 192.168.68.64)
 ' Label:   active sheet cell AA1 = "BMS IP Address:"
 '
 ' Protocol (Wi-Fi GET /last_row):

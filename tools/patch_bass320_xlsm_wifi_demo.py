@@ -61,7 +61,7 @@ def _patch_shared_strings(xml: bytes) -> tuple[bytes, int, int]:
     strings, root = _shared_strings(xml)
     label_idx = _ensure_shared_string(strings, root, "BMS IP Address:")
     # Keep existing sample IP string if present; otherwise add a placeholder.
-    ip_value = "192.168.1.186"
+    ip_value = "192.168.68.64"
     if ip_value in strings:
         ip_idx = strings.index(ip_value)
     else:

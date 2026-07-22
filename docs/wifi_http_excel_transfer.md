@@ -18,12 +18,12 @@ LAN only — no authentication. Do not expose port 8765 beyond the shop network.
 1. Ensure the Pi is on the same Wi-Fi/LAN as the PC.
 2. Recurve → Setup → check **Enable Wi-Fi Transfer**.
 3. On the main screen, press **Transfer** to see `WiFi: <state> <ip>:<port>`
-   (e.g. `WiFi: Connected 192.168.1.186:8765` or `WiFi: No data …`).
+   (e.g. `WiFi: Connected 192.168.68.64:8765` or `WiFi: No data …`).
 
 Smoke test from the PC:
 
 ```powershell
-curl http://192.168.1.186:8765/last_row
+curl http://192.168.68.64:8765/last_row
 ```
 
 Expect `OK` plus eight tab-separated values, or `ERR	No data`.
