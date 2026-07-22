@@ -2,19 +2,18 @@ Attribute VB_Name = "RecurveUsbTransfer"
 '
 ' Import into Bass-320 template:
 '   Developer → Visual Basic → File → Import File… → bass320_get_from_recurve.bas
-' Buttons:
-'   GetFromRecurve     — USB COM (default COM3)
-'   GetFromRecurveWifi — Wi-Fi HTTP using IP in active sheet AA1 (port 8765)
+' Buttons (demo / Wi-Fi only):
+'   GetFromRecurveWifi — "Get Balloon Measurement Data" at AA2
+'   Reads BMS IP from active sheet AB1 (label in AA1); port 8765
 '
-' COM port config (first match wins):
-'   1) Worksheet "Config" cell B2  (recommended: put COM3 there)
-'   2) Active sheet cell Z1
-'   3) DEFAULT_COM_PORT below
+' USB GetFromRecurve remains in this module for future hardware but the
+' Excel USB button is hidden for the demo.
 '
-' Wi-Fi IP: active sheet cell AA1 (e.g. 192.168.1.186)
+' Wi-Fi IP: active sheet cell AB1 (e.g. 192.168.1.186)
+' Label:   active sheet cell AA1 = "BMS IP Address:"
 '
-' Protocol (USB @ 115200 8N1, or Wi-Fi GET /last_row):
-'   PC → Pi: GET_LAST_ROW\n   (USB)  or  GET http://ip:8765/last_row
+' Protocol (Wi-Fi GET /last_row):
+'   PC → Pi: GET http://ip:8765/last_row
 '   Pi → PC: OK\tv1\tv2\t...\tv8\n  or  ERR\tmessage\n
 ' Values are written to columns C–J of the selected row (data rows start at 26).
 
@@ -26,7 +25,8 @@ Private Const DEFAULT_WIFI_PORT As Long = 8765
 Private Const FIRST_DATA_ROW As Long = 26
 Private Const COL_C As Long = 3
 Private Const FIELD_COUNT As Long = 8
-Private Const WIFI_IP_CELL As String = "AA1"
+Private Const WIFI_IP_CELL As String = "AB1"
+Private Const WIFI_IP_LABEL_CELL As String = "AA1"
 
 Private Const GENERIC_READ As Long = &H80000000
 Private Const GENERIC_WRITE As Long = &H40000000
@@ -84,6 +84,7 @@ Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 #End If
 
 Public Sub GetFromRecurve()
+    ' USB path retained for future hardware; button is hidden on the demo sheet.
     Dim portName As String
     Dim reply As String
     Dim targetRow As Long
@@ -103,7 +104,7 @@ Public Sub GetFromRecurve()
     reply = QueryRecurve(portName, DEFAULT_BAUD, "GET_LAST_ROW")
     If Len(Trim$(reply)) = 0 Then
         MsgBox "No response from Recurve on " & portName & "." & vbCrLf & _
-               "Check USB cable, Pi Setup → Enable USB Transfer → Connect, and COM port.", _
+               "USB transfer is hidden for this demo. Use Get Balloon Measurement Data (Wi-Fi).", _
                vbCritical, "Recurve"
         Exit Sub
     End If
@@ -129,13 +130,13 @@ Public Sub GetFromRecurveWifi()
 
     If targetRow < FIRST_DATA_ROW Then
         MsgBox "Select a Bass-320 data row (row " & CStr(FIRST_DATA_ROW) & _
-               " or below), then click Get from Recurve (Wi-Fi).", vbExclamation, "Recurve"
+               " or below), then click Get Balloon Measurement Data.", vbExclamation, "Recurve"
         Exit Sub
     End If
 
     If Len(ipAddr) = 0 Then
-        MsgBox "Put the Pi IP address in cell " & WIFI_IP_CELL & _
-               " (e.g. 192.168.1.186), then try again.", vbExclamation, "Recurve"
+        MsgBox "Put the BMS / Pi IP address in cell " & WIFI_IP_CELL & _
+               " (label in " & WIFI_IP_LABEL_CELL & "), then try again.", vbExclamation, "Recurve"
         Exit Sub
     End If
 
@@ -143,7 +144,7 @@ Public Sub GetFromRecurveWifi()
     If Len(Trim$(reply)) = 0 Then
         MsgBox "No response from Recurve at http://" & ipAddr & ":" & _
                CStr(DEFAULT_WIFI_PORT) & "/last_row" & vbCrLf & _
-               "Check Wi-Fi, Pi Setup → Enable Wi-Fi Transfer → Connect, and " & _
+               "Check Wi-Fi, Pi Setup → Enable Wi-Fi Transfer, and " & _
                WIFI_IP_CELL & ".", vbCritical, "Recurve"
         Exit Sub
     End If
@@ -153,7 +154,7 @@ Public Sub GetFromRecurveWifi()
 
 Fail:
     Application.ScreenUpdating = True
-    MsgBox "Get from Recurve (Wi-Fi) failed: " & Err.Description, vbCritical, "Recurve"
+    MsgBox "Get Balloon Measurement Data failed: " & Err.Description, vbCritical, "Recurve"
 End Sub
 
 Private Sub ApplyReplyToRow(ByVal ws As Worksheet, ByVal targetRow As Long, ByVal reply As String)

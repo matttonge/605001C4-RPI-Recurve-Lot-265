@@ -16,9 +16,7 @@ from app_config import (
     MODE_LOAD,
     MODE_AUTO,
     MODE_MANUAL,
-    USB_TRANSFER_CONNECTED_DEFAULT,
-    USB_TRANSFER_ENABLED_DEFAULT,
-    WIFI_TRANSFER_CONNECTED_DEFAULT,
+    WIFI_HTTP_PORT,
     WIFI_TRANSFER_ENABLED_DEFAULT,
 )
 from serial_transfer import COM_DATA
@@ -28,8 +26,7 @@ from run_auto import rs_auto
 
 from screen_2_app import RcSetupPage2App
 from io_ import I_O,json_cls
-from usb_com_transfer import UsbComTransferServer
-from wifi_http_transfer import WifiHttpTransferServer
+from wifi_http_transfer import WifiHttpTransferServer, get_lan_ip_address
 from touch_numeric_keypad import TouchNumericKeypad
 from inline_numeric_keypad import InlineNumericKeypad
 from touch_alpha_keypad import TouchAlphaKeypad
@@ -235,35 +232,21 @@ class RcPage1bApp:
         self.cv.CurDiaUnits=read_data['cur_dia_units']
         self.cv.CurPosUnits=read_data['cur_pos_units']
         self.TreeFileName = read_data['tree_file_name']
-        self.usb_transfer_enabled = bool(
-            read_data.get("usb_transfer_enabled", USB_TRANSFER_ENABLED_DEFAULT)
-        )
-        self.usb_transfer_connected = bool(
-            read_data.get("usb_transfer_connected", USB_TRANSFER_CONNECTED_DEFAULT)
-        )
+        # Demo: USB Excel transfer hidden (hardware not ready). Wi-Fi only.
+        self.usb_transfer_enabled = False
+        self.usb_transfer_connected = False
         self.wifi_transfer_enabled = bool(
             read_data.get("wifi_transfer_enabled", WIFI_TRANSFER_ENABLED_DEFAULT)
         )
-        self.wifi_transfer_connected = bool(
-            read_data.get("wifi_transfer_connected", WIFI_TRANSFER_CONNECTED_DEFAULT)
-        )
-        self.usb_status_text = "USB off"
+        # Checkbox alone starts the server — keep connected in sync with enabled.
+        self.wifi_transfer_connected = bool(self.wifi_transfer_enabled)
         self.wifi_status_text = "Wi-Fi off"
-        self._usb_server = UsbComTransferServer(
-            tree_provider=lambda: self.tree,
-            cone_flip_provider=lambda: I_O.cone_flip,
-            status_callback=self._on_usb_status,
-        )
         self._wifi_server = WifiHttpTransferServer(
             tree_provider=lambda: self.tree,
             cone_flip_provider=lambda: I_O.cone_flip,
             status_callback=self._on_wifi_status,
         )
-        if self.usb_transfer_enabled and self.usb_transfer_connected:
-            self._usb_server.start()
-        else:
-            self.usb_status_text = "USB off"
-        if self.wifi_transfer_enabled and self.wifi_transfer_connected:
+        if self.wifi_transfer_enabled:
             self._wifi_server.start()
         else:
             self.wifi_status_text = "Wi-Fi off"
@@ -566,17 +549,6 @@ class RcPage1bApp:
         self.setup_tree()
         I_O.write_xl_file(self , self.entry1_.get())
 
-    def _on_usb_status(self, status):
-        self.usb_status_text = status
-        # Marshal UI updates onto the Tk thread when possible.
-        try:
-            self.balloonwindow.after(0, lambda s=status: self._apply_usb_status_ui(s))
-        except Exception:
-            pass
-
-    def _apply_usb_status_ui(self, status):
-        self.usb_status_text = status
-
     def _on_wifi_status(self, status):
         self.wifi_status_text = status
         try:
@@ -587,7 +559,7 @@ class RcPage1bApp:
     def _apply_wifi_status_ui(self, status):
         self.wifi_status_text = status
 
-    def persist_usb_transfer_state(self):
+    def persist_wifi_transfer_state(self):
         self.j.write_to_json(
             COM_DATA.target_balloon_pressure,
             COM_DATA.target_chuck_pressure,
@@ -596,104 +568,41 @@ class RcPage1bApp:
             self.cv.CurDiaUnits,
             self.cv.CurPosUnits,
             self.TreeFileName,
-            usb_transfer_enabled=self.usb_transfer_enabled,
-            usb_transfer_connected=self.usb_transfer_connected,
+            usb_transfer_enabled=False,
+            usb_transfer_connected=False,
             wifi_transfer_enabled=self.wifi_transfer_enabled,
             wifi_transfer_connected=self.wifi_transfer_connected,
         )
 
-    def persist_wifi_transfer_state(self):
-        self.persist_usb_transfer_state()
-
-    def set_usb_transfer_enabled(self, enabled):
-        self.usb_transfer_enabled = bool(enabled)
-        if not self.usb_transfer_enabled:
-            self.usb_transfer_connected = False
-            self._usb_server.stop()
-            self.usb_status_text = "USB off"
-        elif self.usb_transfer_connected:
-            self._usb_server.start()
-        else:
-            self.usb_status_text = "USB off"
-        self.persist_usb_transfer_state()
-
-    def set_usb_transfer_connected(self, connected):
-        if not self.usb_transfer_enabled:
-            self.usb_transfer_connected = False
-            self._usb_server.stop()
-            self.usb_status_text = "USB off"
-            self.persist_usb_transfer_state()
-            return
-        self.usb_transfer_connected = bool(connected)
-        if self.usb_transfer_connected:
-            self._usb_server.start()
-        else:
-            self._usb_server.stop()
-            self.usb_status_text = "USB off"
-        self.persist_usb_transfer_state()
-
     def set_wifi_transfer_enabled(self, enabled):
+        """Setup checkbox: enable starts the HTTP server; disable stops it."""
         self.wifi_transfer_enabled = bool(enabled)
-        if not self.wifi_transfer_enabled:
-            self.wifi_transfer_connected = False
-            self._wifi_server.stop()
-            self.wifi_status_text = "Wi-Fi off"
-        elif self.wifi_transfer_connected:
-            self._wifi_server.start()
-        else:
-            self.wifi_status_text = "Wi-Fi off"
-        self.persist_wifi_transfer_state()
-
-    def set_wifi_transfer_connected(self, connected):
-        if not self.wifi_transfer_enabled:
-            self.wifi_transfer_connected = False
-            self._wifi_server.stop()
-            self.wifi_status_text = "Wi-Fi off"
-            self.persist_wifi_transfer_state()
-            return
-        self.wifi_transfer_connected = bool(connected)
-        if self.wifi_transfer_connected:
+        self.wifi_transfer_connected = bool(enabled)
+        if self.wifi_transfer_enabled:
             self._wifi_server.start()
         else:
             self._wifi_server.stop()
             self.wifi_status_text = "Wi-Fi off"
         self.persist_wifi_transfer_state()
-
-    def get_usb_status_text(self):
-        if not self.usb_transfer_enabled:
-            return "USB off"
-        if not self.usb_transfer_connected:
-            return "USB off"
-        return self.usb_status_text or self._usb_server.last_status or "Waiting"
 
     def get_wifi_status_text(self):
         if not self.wifi_transfer_enabled:
-            return "Wi-Fi off"
-        if not self.wifi_transfer_connected:
-            return "Wi-Fi off"
-        return self.wifi_status_text or self._wifi_server.last_status or "Waiting"
+            return "off"
+        status = self.wifi_status_text or self._wifi_server.last_status or "Waiting"
+        if status in ("Connected", "Waiting") and not self.tree.get_children():
+            return "No data"
+        if status == "Wi-Fi off":
+            return "Waiting"
+        return status
 
     def callback_transfer(self):
-        """Show USB/Wi-Fi connection status. Excel VBA pulls the last row."""
-        usb = self.get_usb_status_text()
-        wifi = self.get_wifi_status_text()
-        if self.usb_transfer_enabled and self.usb_transfer_connected and usb == "Connected":
-            children = self.tree.get_children()
-            if not children:
-                usb = "No data"
-        if self.wifi_transfer_enabled and self.wifi_transfer_connected and wifi == "Connected":
-            children = self.tree.get_children()
-            if not children:
-                wifi = "No data"
-        parts = []
-        if self.usb_transfer_enabled:
-            parts.append("USB:" + usb)
-        if self.wifi_transfer_enabled:
-            parts.append("WiFi:" + wifi)
-        if not parts:
-            status = "USB off"
+        """Show Wi-Fi transfer state (IP:port when enabled). Excel VBA pulls the last row."""
+        if not self.wifi_transfer_enabled:
+            status = "WiFi: off"
         else:
-            status = " ".join(parts)
+            wifi = self.get_wifi_status_text()
+            endpoint = f"{get_lan_ip_address()}:{WIFI_HTTP_PORT}"
+            status = f"WiFi: {wifi} {endpoint}"
         self._flash_status_message(status)
 
     def _flash_status_message(self, text, clear_ms=1800):
@@ -903,11 +812,7 @@ class RcPage1bApp:
 
     def btn_exit(self):
         try:
-            self.persist_usb_transfer_state()
-        except Exception:
-            pass
-        try:
-            self._usb_server.stop()
+            self.persist_wifi_transfer_state()
         except Exception:
             pass
         try:

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 
-from wifi_http_transfer import WifiHttpTransferServer
+from wifi_http_transfer import WifiHttpTransferServer, get_lan_ip_address
 
 
 class TestWifiHttpTransferServer(unittest.TestCase):
@@ -29,6 +29,11 @@ class TestWifiHttpTransferServer(unittest.TestCase):
         reply = server.handle_last_row()
         self.assertTrue(reply.startswith("ERR\t"))
         self.assertIn("No data", reply)
+
+    def test_get_lan_ip_address_returns_string(self):
+        ip = get_lan_ip_address()
+        self.assertIsInstance(ip, str)
+        self.assertTrue(len(ip) > 0)
 
 
 if __name__ == "__main__":
