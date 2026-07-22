@@ -18,6 +18,8 @@ from app_config import (
     MODE_MANUAL,
     USB_TRANSFER_CONNECTED_DEFAULT,
     USB_TRANSFER_ENABLED_DEFAULT,
+    WIFI_TRANSFER_CONNECTED_DEFAULT,
+    WIFI_TRANSFER_ENABLED_DEFAULT,
 )
 from serial_transfer import COM_DATA
 from conversions import CONVERSIONS
@@ -27,6 +29,7 @@ from run_auto import rs_auto
 from screen_2_app import RcSetupPage2App
 from io_ import I_O,json_cls
 from usb_com_transfer import UsbComTransferServer
+from wifi_http_transfer import WifiHttpTransferServer
 from touch_numeric_keypad import TouchNumericKeypad
 from inline_numeric_keypad import InlineNumericKeypad
 from touch_alpha_keypad import TouchAlphaKeypad
@@ -238,16 +241,32 @@ class RcPage1bApp:
         self.usb_transfer_connected = bool(
             read_data.get("usb_transfer_connected", USB_TRANSFER_CONNECTED_DEFAULT)
         )
+        self.wifi_transfer_enabled = bool(
+            read_data.get("wifi_transfer_enabled", WIFI_TRANSFER_ENABLED_DEFAULT)
+        )
+        self.wifi_transfer_connected = bool(
+            read_data.get("wifi_transfer_connected", WIFI_TRANSFER_CONNECTED_DEFAULT)
+        )
         self.usb_status_text = "USB off"
+        self.wifi_status_text = "Wi-Fi off"
         self._usb_server = UsbComTransferServer(
             tree_provider=lambda: self.tree,
             cone_flip_provider=lambda: I_O.cone_flip,
             status_callback=self._on_usb_status,
         )
+        self._wifi_server = WifiHttpTransferServer(
+            tree_provider=lambda: self.tree,
+            cone_flip_provider=lambda: I_O.cone_flip,
+            status_callback=self._on_wifi_status,
+        )
         if self.usb_transfer_enabled and self.usb_transfer_connected:
             self._usb_server.start()
         else:
             self.usb_status_text = "USB off"
+        if self.wifi_transfer_enabled and self.wifi_transfer_connected:
+            self._wifi_server.start()
+        else:
+            self.wifi_status_text = "Wi-Fi off"
 
         self.entry1_.configure(state="normal")
         try:
@@ -558,6 +577,16 @@ class RcPage1bApp:
     def _apply_usb_status_ui(self, status):
         self.usb_status_text = status
 
+    def _on_wifi_status(self, status):
+        self.wifi_status_text = status
+        try:
+            self.balloonwindow.after(0, lambda s=status: self._apply_wifi_status_ui(s))
+        except Exception:
+            pass
+
+    def _apply_wifi_status_ui(self, status):
+        self.wifi_status_text = status
+
     def persist_usb_transfer_state(self):
         self.j.write_to_json(
             COM_DATA.target_balloon_pressure,
@@ -569,7 +598,12 @@ class RcPage1bApp:
             self.TreeFileName,
             usb_transfer_enabled=self.usb_transfer_enabled,
             usb_transfer_connected=self.usb_transfer_connected,
+            wifi_transfer_enabled=self.wifi_transfer_enabled,
+            wifi_transfer_connected=self.wifi_transfer_connected,
         )
+
+    def persist_wifi_transfer_state(self):
+        self.persist_usb_transfer_state()
 
     def set_usb_transfer_enabled(self, enabled):
         self.usb_transfer_enabled = bool(enabled)
@@ -598,6 +632,33 @@ class RcPage1bApp:
             self.usb_status_text = "USB off"
         self.persist_usb_transfer_state()
 
+    def set_wifi_transfer_enabled(self, enabled):
+        self.wifi_transfer_enabled = bool(enabled)
+        if not self.wifi_transfer_enabled:
+            self.wifi_transfer_connected = False
+            self._wifi_server.stop()
+            self.wifi_status_text = "Wi-Fi off"
+        elif self.wifi_transfer_connected:
+            self._wifi_server.start()
+        else:
+            self.wifi_status_text = "Wi-Fi off"
+        self.persist_wifi_transfer_state()
+
+    def set_wifi_transfer_connected(self, connected):
+        if not self.wifi_transfer_enabled:
+            self.wifi_transfer_connected = False
+            self._wifi_server.stop()
+            self.wifi_status_text = "Wi-Fi off"
+            self.persist_wifi_transfer_state()
+            return
+        self.wifi_transfer_connected = bool(connected)
+        if self.wifi_transfer_connected:
+            self._wifi_server.start()
+        else:
+            self._wifi_server.stop()
+            self.wifi_status_text = "Wi-Fi off"
+        self.persist_wifi_transfer_state()
+
     def get_usb_status_text(self):
         if not self.usb_transfer_enabled:
             return "USB off"
@@ -605,15 +666,34 @@ class RcPage1bApp:
             return "USB off"
         return self.usb_status_text or self._usb_server.last_status or "Waiting"
 
+    def get_wifi_status_text(self):
+        if not self.wifi_transfer_enabled:
+            return "Wi-Fi off"
+        if not self.wifi_transfer_connected:
+            return "Wi-Fi off"
+        return self.wifi_status_text or self._wifi_server.last_status or "Waiting"
+
     def callback_transfer(self):
-        """Show USB COM connection status. Excel VBA pulls the last row."""
-        status = self.get_usb_status_text()
-        if not self.usb_transfer_enabled or not self.usb_transfer_connected:
-            status = "USB off"
-        elif status == "Connected":
+        """Show USB/Wi-Fi connection status. Excel VBA pulls the last row."""
+        usb = self.get_usb_status_text()
+        wifi = self.get_wifi_status_text()
+        if self.usb_transfer_enabled and self.usb_transfer_connected and usb == "Connected":
             children = self.tree.get_children()
             if not children:
-                status = "No data"
+                usb = "No data"
+        if self.wifi_transfer_enabled and self.wifi_transfer_connected and wifi == "Connected":
+            children = self.tree.get_children()
+            if not children:
+                wifi = "No data"
+        parts = []
+        if self.usb_transfer_enabled:
+            parts.append("USB:" + usb)
+        if self.wifi_transfer_enabled:
+            parts.append("WiFi:" + wifi)
+        if not parts:
+            status = "USB off"
+        else:
+            status = " ".join(parts)
         self._flash_status_message(status)
 
     def _flash_status_message(self, text, clear_ms=1800):
@@ -828,6 +908,10 @@ class RcPage1bApp:
             pass
         try:
             self._usb_server.stop()
+        except Exception:
+            pass
+        try:
+            self._wifi_server.stop()
         except Exception:
             pass
         self.cd.deinit()

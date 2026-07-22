@@ -8,5 +8,7 @@
     "cone_flip": 1,
     "tree_file_name": "Test",
     "usb_transfer_enabled": false,
-    "usb_transfer_connected": false
+    "usb_transfer_connected": false,
+    "wifi_transfer_enabled": false,
+    "wifi_transfer_connected": false
 }

@@ -2,15 +2,19 @@ Attribute VB_Name = "RecurveUsbTransfer"
 '
 ' Import into Bass-320 template:
 '   Developer → Visual Basic → File → Import File… → bass320_get_from_recurve.bas
-' Assign a button macro to GetFromRecurve ("Get from Recurve").
+' Buttons:
+'   GetFromRecurve     — USB COM (default COM3)
+'   GetFromRecurveWifi — Wi-Fi HTTP using IP in active sheet AA1 (port 8765)
 '
 ' COM port config (first match wins):
 '   1) Worksheet "Config" cell B2  (recommended: put COM3 there)
 '   2) Active sheet cell Z1
 '   3) DEFAULT_COM_PORT below
 '
-' Protocol @ 115200 8N1:
-'   PC → Pi: GET_LAST_ROW\n
+' Wi-Fi IP: active sheet cell AA1 (e.g. 192.168.1.186)
+'
+' Protocol (USB @ 115200 8N1, or Wi-Fi GET /last_row):
+'   PC → Pi: GET_LAST_ROW\n   (USB)  or  GET http://ip:8765/last_row
 '   Pi → PC: OK\tv1\tv2\t...\tv8\n  or  ERR\tmessage\n
 ' Values are written to columns C–J of the selected row (data rows start at 26).
 
@@ -18,9 +22,11 @@ Option Explicit
 
 Private Const DEFAULT_COM_PORT As String = "COM3"
 Private Const DEFAULT_BAUD As Long = 115200
+Private Const DEFAULT_WIFI_PORT As Long = 8765
 Private Const FIRST_DATA_ROW As Long = 26
 Private Const COL_C As Long = 3
 Private Const FIELD_COUNT As Long = 8
+Private Const WIFI_IP_CELL As String = "AA1"
 
 Private Const GENERIC_READ As Long = &H80000000
 Private Const GENERIC_WRITE As Long = &H40000000
@@ -80,9 +86,7 @@ Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 Public Sub GetFromRecurve()
     Dim portName As String
     Dim reply As String
-    Dim parts() As String
     Dim targetRow As Long
-    Dim i As Long
     Dim ws As Worksheet
 
     On Error GoTo Fail
@@ -103,6 +107,58 @@ Public Sub GetFromRecurve()
                vbCritical, "Recurve"
         Exit Sub
     End If
+
+    ApplyReplyToRow ws, targetRow, reply
+    Exit Sub
+
+Fail:
+    Application.ScreenUpdating = True
+    MsgBox "Get from Recurve failed: " & Err.Description, vbCritical, "Recurve"
+End Sub
+
+Public Sub GetFromRecurveWifi()
+    Dim ipAddr As String
+    Dim reply As String
+    Dim targetRow As Long
+    Dim ws As Worksheet
+
+    On Error GoTo Fail
+    Set ws = ActiveSheet
+    ipAddr = ReadWifiIp(ws)
+    targetRow = ActiveCell.Row
+
+    If targetRow < FIRST_DATA_ROW Then
+        MsgBox "Select a Bass-320 data row (row " & CStr(FIRST_DATA_ROW) & _
+               " or below), then click Get from Recurve (Wi-Fi).", vbExclamation, "Recurve"
+        Exit Sub
+    End If
+
+    If Len(ipAddr) = 0 Then
+        MsgBox "Put the Pi IP address in cell " & WIFI_IP_CELL & _
+               " (e.g. 192.168.1.186), then try again.", vbExclamation, "Recurve"
+        Exit Sub
+    End If
+
+    reply = QueryRecurveWifi(ipAddr, DEFAULT_WIFI_PORT)
+    If Len(Trim$(reply)) = 0 Then
+        MsgBox "No response from Recurve at http://" & ipAddr & ":" & _
+               CStr(DEFAULT_WIFI_PORT) & "/last_row" & vbCrLf & _
+               "Check Wi-Fi, Pi Setup → Enable Wi-Fi Transfer → Connect, and " & _
+               WIFI_IP_CELL & ".", vbCritical, "Recurve"
+        Exit Sub
+    End If
+
+    ApplyReplyToRow ws, targetRow, reply
+    Exit Sub
+
+Fail:
+    Application.ScreenUpdating = True
+    MsgBox "Get from Recurve (Wi-Fi) failed: " & Err.Description, vbCritical, "Recurve"
+End Sub
+
+Private Sub ApplyReplyToRow(ByVal ws As Worksheet, ByVal targetRow As Long, ByVal reply As String)
+    Dim parts() As String
+    Dim i As Long
 
     parts = Split(reply, vbTab)
     If UBound(parts) < 1 Then
@@ -129,12 +185,34 @@ Public Sub GetFromRecurve()
         ws.Cells(targetRow, COL_C + i - 1).Value = parts(i)
     Next i
     Application.ScreenUpdating = True
-    Exit Sub
-
-Fail:
-    Application.ScreenUpdating = True
-    MsgBox "Get from Recurve failed: " & Err.Description, vbCritical, "Recurve"
 End Sub
+
+Private Function ReadWifiIp(ByVal ws As Worksheet) As String
+    Dim v As Variant
+    v = ws.Range(WIFI_IP_CELL).Value
+    ReadWifiIp = Trim$(CStr(v & ""))
+End Function
+
+Private Function QueryRecurveWifi(ByVal ipAddr As String, ByVal port As Long) As String
+    Dim http As Object
+    Dim url As String
+    Dim status As Long
+    Dim body As String
+
+    url = "http://" & ipAddr & ":" & CStr(port) & "/last_row"
+    Set http = CreateObject("WinHttp.WinHttpRequest.5.1")
+    http.SetTimeouts 2000, 2000, 3000, 3000
+    http.Open "GET", url, False
+    http.Send
+    status = CLng(http.Status)
+    body = CStr(http.ResponseText)
+    If status < 200 Or status >= 300 Then
+        If Len(Trim$(body)) = 0 Then
+            Err.Raise vbObjectError + 2001, , "HTTP " & CStr(status)
+        End If
+    End If
+    QueryRecurveWifi = FirstLine(body)
+End Function
 
 Private Function ReadComPort(ByVal ws As Worksheet) As String
     Dim cfg As Worksheet

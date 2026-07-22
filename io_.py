@@ -8,6 +8,8 @@ from app_config import (
     STARTUP_JSON_NAME,
     USB_TRANSFER_CONNECTED_DEFAULT,
     USB_TRANSFER_ENABLED_DEFAULT,
+    WIFI_TRANSFER_CONNECTED_DEFAULT,
+    WIFI_TRANSFER_ENABLED_DEFAULT,
 )
 from conversions import CONVERSIONS
 import time
@@ -167,8 +169,10 @@ class json_cls:
         tree_file_name,
         usb_transfer_enabled=None,
         usb_transfer_connected=None,
+        wifi_transfer_enabled=None,
+        wifi_transfer_connected=None,
     ):
-        # Preserve existing USB flags when callers omit them (e.g. Setup Exit).
+        # Preserve existing transfer flags when callers omit them (e.g. Setup Exit).
         existing = {}
         try:
             with open(str(PROJECT_PATH / STARTUP_JSON_NAME), "r") as f:
@@ -184,6 +188,14 @@ class json_cls:
             usb_transfer_connected = bool(
                 existing.get("usb_transfer_connected", USB_TRANSFER_CONNECTED_DEFAULT)
             )
+        if wifi_transfer_enabled is None:
+            wifi_transfer_enabled = bool(
+                existing.get("wifi_transfer_enabled", WIFI_TRANSFER_ENABLED_DEFAULT)
+            )
+        if wifi_transfer_connected is None:
+            wifi_transfer_connected = bool(
+                existing.get("wifi_transfer_connected", WIFI_TRANSFER_CONNECTED_DEFAULT)
+            )
 
         data = {
             "target_chuck_pressure": chuck_pres,
@@ -196,6 +208,8 @@ class json_cls:
             "tree_file_name": tree_file_name,
             "usb_transfer_enabled": bool(usb_transfer_enabled),
             "usb_transfer_connected": bool(usb_transfer_connected),
+            "wifi_transfer_enabled": bool(wifi_transfer_enabled),
+            "wifi_transfer_connected": bool(wifi_transfer_connected),
         }
         with open(str(PROJECT_PATH / STARTUP_JSON_NAME), "w") as f:
             json.dump(data, f, indent=4)
@@ -212,5 +226,7 @@ class json_cls:
             I_O.cone_flip = bool(data.get("cone_flip", False))
         data.setdefault("usb_transfer_enabled", USB_TRANSFER_ENABLED_DEFAULT)
         data.setdefault("usb_transfer_connected", USB_TRANSFER_CONNECTED_DEFAULT)
+        data.setdefault("wifi_transfer_enabled", WIFI_TRANSFER_ENABLED_DEFAULT)
+        data.setdefault("wifi_transfer_connected", WIFI_TRANSFER_CONNECTED_DEFAULT)
         return data
 
