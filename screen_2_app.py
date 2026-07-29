@@ -12,8 +12,7 @@ from serial_transfer import COM_DATA
 from io_ import I_O,json_cls
 from touch_numeric_keypad import TouchNumericKeypad
 from inline_numeric_keypad import InlineNumericKeypad
-from keypad_layout import configure_linux_kiosk_window, prime_linux_kiosk_keyboard, release_linux_keyboard_field
-from bass320_transfer import last_tree_row_values
+from keypad_layout import configure_linux_kiosk_window, release_linux_keyboard_field
 
 
 PROJECT_PATH = pathlib.Path(__file__).parent
@@ -38,6 +37,7 @@ class RcSetupPage2App:
         # often never delivers focus/clicks to children (UI had takefocus=false).
         try:
             self.mainwindow.configure(takefocus=True)
+            self.mainwindow.lift()
             self.mainwindow.after(50, self.mainwindow.focus_force)
         except tk.TclError:
             pass
@@ -73,11 +73,8 @@ class RcSetupPage2App:
         self.v_clamp_ref_sldr = None
         self.clamp_ref_press_str = None
         self.v_clamp_cal_rb = None
-        self.prox_left = 0
-        self.usb_transfer_enabled = None
-        self.usb_status_str = None
-        self.wifi_transfer_enabled = None
-        self.wifi_status_str = None
+        self.v_load_position = None
+        self.v_excel_transfer = None
         self._suppress_pressure_entry_focusout = False
         self._numeric_keypad_win = None
         self._active_keypad_var = None
@@ -118,10 +115,8 @@ class RcSetupPage2App:
                                   'v_clamp_ref_sldr',
                                   'clamp_ref_press_str',
                                   'v_clamp_cal_rb',
-                                  'usb_transfer_enabled',
-                                  'usb_status_str',
-                                  'wifi_transfer_enabled',
-                                  'wifi_status_str'])
+                                  'v_load_position',
+                                  'v_excel_transfer'])
 
 
         self.v_bal_units = self.builder.get_variable('v_bal_units')
@@ -155,9 +150,10 @@ class RcSetupPage2App:
         self.clamp_trgt_press_entry = self.builder.get_object('clamp_trgt_press_str_id')
         self.bal_cal_ref_entry = self.builder.get_object('bal_cal_ref_press_str')
         self.clamp_cal_ref_entry = self.builder.get_object('clamp_cal_ref_press_str')
-        self.cb_prox_left = self.builder.get_object('cb_prox_left')
-        self.usb_connect_btn = self.builder.get_object('usb_connect_btn')
-        self.wifi_connect_btn = self.builder.get_object('wifi_connect_btn')
+        self.prox_right_rb = self.builder.get_object('prox_right_rb')
+        self.prox_left_rb = self.builder.get_object('prox_left_rb')
+        self.wifi_transfer_on_rb = self.builder.get_object('wifi_transfer_on_rb')
+        self.wifi_transfer_off_rb = self.builder.get_object('wifi_transfer_off_rb')
          
         self.msg_box = self.builder.get_object('msg_box_tx')
          
@@ -207,140 +203,35 @@ class RcSetupPage2App:
 
         self.cd.set_master(self)
         self.set_cur_input_press(COM_DATA.current_input_pressure)
-        if(I_O.cone_flip) : 
-            self.cb_prox_left.select()
-        else: 
-            self.cb_prox_left.deselect()
+        # Prox Left => cone_flip True; Prox Right => False (same as old checkbox).
+        self.v_load_position.set("left" if I_O.cone_flip else "right")
 
-        self._init_usb_transfer_controls()
         self._init_wifi_transfer_controls()
 
       #  self.cd = my_cd #COM_DATA(self)
         
-    def run(self): 
-        self.mainwindow.mainloop()
-
-    def _init_usb_transfer_controls(self):
-        enabled = bool(getattr(self.parent, "usb_transfer_enabled", False))
-        self.usb_transfer_enabled.set(1 if enabled else 0)
-        self._refresh_usb_transfer_ui()
-        # Poll status while Setup is open (server updates from another thread).
-        self._schedule_usb_status_poll()
+    def run(self):
+        # Wait inside Screen 1's existing mainloop. A nested mainloop() here can
+        # unwind the outer loop when Setup closes and leave Screen 1 widgets dead.
+        self.mainwindow.wait_window(self.mainwindow)
 
     def _init_wifi_transfer_controls(self):
-        enabled = bool(getattr(self.parent, "wifi_transfer_enabled", False))
-        self.wifi_transfer_enabled.set(1 if enabled else 0)
+        # On/Off radios start/stop the HTTP transfer server (On = connected).
+        if hasattr(self.parent, "wifi_transfer_enabled"):
+            self.parent.wifi_transfer_enabled = True
+        connected = bool(getattr(self.parent, "wifi_transfer_connected", False))
+        self.v_excel_transfer.set("on" if connected else "off")
         self._refresh_wifi_transfer_ui()
-        self._schedule_wifi_status_poll()
-
-    def _schedule_usb_status_poll(self):
-        try:
-            if not self.mainwindow.winfo_exists():
-                return
-        except tk.TclError:
-            return
-        self._refresh_usb_transfer_ui()
-        try:
-            self.mainwindow.after(500, self._schedule_usb_status_poll)
-        except tk.TclError:
-            pass
-
-    def _schedule_wifi_status_poll(self):
-        try:
-            if not self.mainwindow.winfo_exists():
-                return
-        except tk.TclError:
-            return
-        self._refresh_wifi_transfer_ui()
-        try:
-            self.mainwindow.after(500, self._schedule_wifi_status_poll)
-        except tk.TclError:
-            pass
-
-    def _usb_display_status(self):
-        if not getattr(self.parent, "usb_transfer_enabled", False):
-            return "USB off"
-        if not getattr(self.parent, "usb_transfer_connected", False):
-            return "USB off"
-        status = "Waiting"
-        if hasattr(self.parent, "get_usb_status_text"):
-            status = self.parent.get_usb_status_text()
-        if status == "Connected":
-            tree = getattr(self.parent, "tree", None)
-            if tree is not None and last_tree_row_values(tree) is None:
-                return "No data"
-        return status
-
-    def _wifi_display_status(self):
-        if not getattr(self.parent, "wifi_transfer_enabled", False):
-            return "Wi-Fi off"
-        if not getattr(self.parent, "wifi_transfer_connected", False):
-            return "Wi-Fi off"
-        status = "Waiting"
-        if hasattr(self.parent, "get_wifi_status_text"):
-            status = self.parent.get_wifi_status_text()
-        if status == "Connected":
-            tree = getattr(self.parent, "tree", None)
-            if tree is not None and last_tree_row_values(tree) is None:
-                return "No data"
-        return status
-
-    def _refresh_usb_transfer_ui(self):
-        enabled = bool(getattr(self.parent, "usb_transfer_enabled", False))
-        connected = bool(getattr(self.parent, "usb_transfer_connected", False))
-        try:
-            self.usb_connect_btn.configure(
-                text="Disconnect" if (enabled and connected) else "Connect",
-                state=("normal" if enabled else "disabled"),
-            )
-        except tk.TclError:
-            pass
-        try:
-            self.usb_status_str.set(self._usb_display_status())
-        except Exception:
-            pass
 
     def _refresh_wifi_transfer_ui(self):
-        enabled = bool(getattr(self.parent, "wifi_transfer_enabled", False))
         connected = bool(getattr(self.parent, "wifi_transfer_connected", False))
         try:
-            self.wifi_connect_btn.configure(
-                text="Disconnect" if (enabled and connected) else "Connect",
-                state=("normal" if enabled else "disabled"),
-            )
-        except tk.TclError:
-            pass
-        try:
-            self.wifi_status_str.set(self._wifi_display_status())
+            self.v_excel_transfer.set("on" if connected else "off")
         except Exception:
             pass
 
-    def callback_usb_transfer_enable(self):
-        enabled = bool(self.usb_transfer_enabled.get())
-        if hasattr(self.parent, "set_usb_transfer_enabled"):
-            self.parent.set_usb_transfer_enabled(enabled)
-        self._refresh_usb_transfer_ui()
-
-    def callback_usb_connect_toggle(self):
-        if not getattr(self.parent, "usb_transfer_enabled", False):
-            self._refresh_usb_transfer_ui()
-            return
-        connected = not bool(getattr(self.parent, "usb_transfer_connected", False))
-        if hasattr(self.parent, "set_usb_transfer_connected"):
-            self.parent.set_usb_transfer_connected(connected)
-        self._refresh_usb_transfer_ui()
-
-    def callback_wifi_transfer_enable(self):
-        enabled = bool(self.wifi_transfer_enabled.get())
-        if hasattr(self.parent, "set_wifi_transfer_enabled"):
-            self.parent.set_wifi_transfer_enabled(enabled)
-        self._refresh_wifi_transfer_ui()
-
-    def callback_wifi_connect_toggle(self):
-        if not getattr(self.parent, "wifi_transfer_enabled", False):
-            self._refresh_wifi_transfer_ui()
-            return
-        connected = not bool(getattr(self.parent, "wifi_transfer_connected", False))
+    def callback_wifi_transfer_toggle(self):
+        connected = self.v_excel_transfer.get() == "on"
         if hasattr(self.parent, "set_wifi_transfer_connected"):
             self.parent.set_wifi_transfer_connected(connected)
         self._refresh_wifi_transfer_ui()
@@ -567,12 +458,9 @@ class RcSetupPage2App:
     def callback_get_data(self):
         pass
 
-    def callback_flip_cone(self):
-        I_O.cone_flip = not I_O.cone_flip
-        if(I_O.cone_flip) : 
-            self.cb_prox_left.select()
-        else: 
-            self.cb_prox_left.deselect()
+    def callback_load_position(self):
+        """Load Position radios: Prox Left / Prox Right (same as former Proximal Left checkbox)."""
+        I_O.cone_flip = self.v_load_position.get() == "left"
         # Keep Screen 1 Excel headers, diagram labels, and message orientation in sync.
         if hasattr(self.parent, "apply_cone_orientation"):
             self.parent.apply_cone_orientation(preserve_rows=True)
@@ -589,20 +477,23 @@ class RcSetupPage2App:
             self.parent.cv.CurDiaUnits,
             self.parent.cv.CurPosUnits,
             self.parent.TreeFileName,
-            usb_transfer_enabled=getattr(self.parent, "usb_transfer_enabled", False),
-            usb_transfer_connected=getattr(self.parent, "usb_transfer_connected", False),
-            wifi_transfer_enabled=getattr(self.parent, "wifi_transfer_enabled", False),
+            usb_transfer_enabled=False,
+            usb_transfer_connected=False,
+            wifi_transfer_enabled=True,
             wifi_transfer_connected=getattr(self.parent, "wifi_transfer_connected", False),
         )
-        self.parent.callback_clear_data()
+        # Reload under Setup's cover, lift Screen 1, then destroy Setup so the
+        # desktop never shows between screens.
+        if hasattr(self.parent, "reload_current_lot"):
+            self.parent.reload_current_lot()
         self._close_numeric_keypad()
-        self.mainwindow.destroy()
+        release_linux_keyboard_field(self.parent.entry1_)
         try:
-            self.parent.balloonwindow.deiconify()
+            self.parent.balloonwindow.lift()
+            self.parent.balloonwindow.update_idletasks()
         except tk.TclError:
             pass
-        release_linux_keyboard_field(self.parent.entry1_)
-        prime_linux_kiosk_keyboard(self.parent.balloonwindow)
+        self.mainwindow.destroy()
 
     def _close_numeric_keypad(self):
         if self._numeric_keypad_win is None:

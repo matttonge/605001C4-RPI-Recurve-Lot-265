@@ -1,4 +1,6 @@
 #!/bin/bash
+# Enable Wi-Fi Excel transfer for the demo and restart the Recurve UI.
+# USB transfer is forced off (hidden in the demo UI).
 set -e
 cd /home/rp/Desktop/Recurve
 python3 <<'PY'
@@ -7,9 +9,8 @@ p = "startup.json"
 d = json.load(open(p))
 d["wifi_transfer_enabled"] = True
 d["wifi_transfer_connected"] = True
-# Keep USB as previously configured if keys exist; default keep True for prototype
-d.setdefault("usb_transfer_enabled", True)
-d.setdefault("usb_transfer_connected", True)
+d["usb_transfer_enabled"] = False
+d["usb_transfer_connected"] = False
 json.dump(d, open(p, "w"), indent=4)
 print(
     "usb", d.get("usb_transfer_enabled"), d.get("usb_transfer_connected"),

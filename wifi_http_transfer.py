@@ -6,6 +6,7 @@ by USB COM. See docs/wifi_http_excel_transfer.md.
 
 from __future__ import annotations
 
+import socket
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Callable, Optional
@@ -16,6 +17,30 @@ from bass320_transfer import (
     format_err_response,
     handle_get_last_row_command,
 )
+
+
+def get_lan_ip_address() -> str:
+    """Best-effort LAN IPv4 for status display (not the bind address)."""
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            sock.connect(("8.8.8.8", 80))
+            ip = sock.getsockname()[0]
+        finally:
+            sock.close()
+        if ip and not ip.startswith("127."):
+            return ip
+    except OSError:
+        pass
+    try:
+        hostname = socket.gethostname()
+        for info in socket.getaddrinfo(hostname, None, socket.AF_INET):
+            ip = info[4][0]
+            if ip and not ip.startswith("127."):
+                return ip
+    except OSError:
+        pass
+    return "0.0.0.0"
 
 
 class WifiHttpTransferServer:

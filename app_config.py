@@ -29,7 +29,7 @@ USB_COM_OPEN_RETRY_SEC = 1.0
 USB_TRANSFER_ENABLED_DEFAULT = False
 USB_TRANSFER_CONNECTED_DEFAULT = False
 
-# Wi-Fi HTTP Excel transfer (same Bass-320 payload as USB COM).
+# Wi-Fi HTTP Excel transfer (Bass-320). Demo UI is Wi-Fi-only; USB transfer is hidden.
 WIFI_HTTP_HOST = "0.0.0.0"
 WIFI_HTTP_PORT = 8765
 WIFI_TRANSFER_ENABLED_DEFAULT = False
