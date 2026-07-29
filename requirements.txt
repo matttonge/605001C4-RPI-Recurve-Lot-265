@@ -1,0 +1,7 @@
+# Python dependencies for the Recurve Raspberry Pi leak-test GUI application.
+# Install into a virtualenv:  python3 -m venv venv && venv/bin/pip install -r requirements.txt
+# Note: tkinter is required but is NOT a pip package. Install it via the OS
+# package manager (Debian/Ubuntu/Raspberry Pi OS: `sudo apt install python3-tk`).
+pygubu
+pyserial
+openpyxl
