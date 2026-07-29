@@ -16,8 +16,7 @@ from app_config import (
     MODE_LOAD,
     MODE_AUTO,
     MODE_MANUAL,
-    WIFI_HTTP_PORT,
-    WIFI_TRANSFER_ENABLED_DEFAULT,
+    WIFI_TRANSFER_CONNECTED_DEFAULT,
 )
 from serial_transfer import COM_DATA
 from conversions import CONVERSIONS
@@ -233,20 +232,20 @@ class RcPage1bApp:
         self.cv.CurPosUnits=read_data['cur_pos_units']
         self.TreeFileName = read_data['tree_file_name']
         # Demo: USB Excel transfer hidden (hardware not ready). Wi-Fi only.
+        # Enable is always on; Connect/Disconnect starts/stops the HTTP server.
         self.usb_transfer_enabled = False
         self.usb_transfer_connected = False
-        self.wifi_transfer_enabled = bool(
-            read_data.get("wifi_transfer_enabled", WIFI_TRANSFER_ENABLED_DEFAULT)
+        self.wifi_transfer_enabled = True
+        self.wifi_transfer_connected = bool(
+            read_data.get("wifi_transfer_connected", WIFI_TRANSFER_CONNECTED_DEFAULT)
         )
-        # Checkbox alone starts the server — keep connected in sync with enabled.
-        self.wifi_transfer_connected = bool(self.wifi_transfer_enabled)
         self.wifi_status_text = "Wi-Fi off"
         self._wifi_server = WifiHttpTransferServer(
             tree_provider=lambda: self.tree,
             cone_flip_provider=lambda: I_O.cone_flip,
             status_callback=self._on_wifi_status,
         )
-        if self.wifi_transfer_enabled:
+        if self.wifi_transfer_connected:
             self._wifi_server.start()
         else:
             self.wifi_status_text = "Wi-Fi off"
@@ -294,6 +293,8 @@ class RcPage1bApp:
 
     def _load_lot_into_tree(self, lot_number):
         """Load an existing lot workbook, or clear the tree for a new lot name."""
+        if not self._tree_alive():
+            return
         lot_number = (lot_number or "").strip()
         if not lot_number:
             I_O.cone_flip = False
@@ -307,8 +308,33 @@ class RcPage1bApp:
         I_O.cone_flip = False
         self.apply_cone_orientation(preserve_rows=False)
 
+    def reload_current_lot(self):
+        """Refresh lot list from disk and reload the current lot into the tree."""
+        if not self._tree_alive():
+            return
+        try:
+            I_O.load_lot_number(self)
+        except Exception:
+            pass
+        lot = ""
+        try:
+            lot = (self.entry1_.get() or "").strip()
+        except tk.TclError:
+            lot = ""
+        if not lot:
+            lot = (self.TreeFileName or "").strip()
+        if lot:
+            self.TreeFileName = lot
+            try:
+                self.entry1_.set(lot)
+            except tk.TclError:
+                pass
+        self._load_lot_into_tree(lot)
+
     def apply_cone_orientation(self, preserve_rows=True):
         """Refresh tree headers and diagram labels from I_O.cone_flip."""
+        if not self._tree_alive():
+            return
         rows = []
         if preserve_rows:
             try:
@@ -461,14 +487,22 @@ class RcPage1bApp:
         self._open_lot_keypad()
 
 
-    def clear_treeview(self,tree):
-        # Clearing all the rows
-        for item in tree.get_children():
-            tree.delete(item)
-        
-        # Clearing all the columns
-        tree.configure(columns=())
-     
+    def clear_treeview(self, tree):
+        try:
+            if tree is None or not tree.winfo_exists():
+                return
+            for item in tree.get_children():
+                tree.delete(item)
+            tree.configure(columns=())
+        except tk.TclError:
+            pass
+
+    def _tree_alive(self):
+        try:
+            return self.tree is not None and bool(self.tree.winfo_exists())
+        except tk.TclError:
+            return False
+
 
     def setup_tree(self):   
      #   cols = ("Dist. OD\n (inch)","Dist. Cone Length (mm)","Body Length (mm)","ΦA1 (mm)","ΦA2 (mm)","ΦA3 (mm)","Prox. Cone\nLength (mm)","Prox.OD\n (inch)")
@@ -560,6 +594,7 @@ class RcPage1bApp:
         self.wifi_status_text = status
 
     def persist_wifi_transfer_state(self):
+        self.wifi_transfer_enabled = True
         self.j.write_to_json(
             COM_DATA.target_balloon_pressure,
             COM_DATA.target_chuck_pressure,
@@ -570,15 +605,16 @@ class RcPage1bApp:
             self.TreeFileName,
             usb_transfer_enabled=False,
             usb_transfer_connected=False,
-            wifi_transfer_enabled=self.wifi_transfer_enabled,
+            wifi_transfer_enabled=True,
             wifi_transfer_connected=self.wifi_transfer_connected,
         )
 
-    def set_wifi_transfer_enabled(self, enabled):
-        """Setup checkbox: enable starts the HTTP server; disable stops it."""
-        self.wifi_transfer_enabled = bool(enabled)
-        self.wifi_transfer_connected = bool(enabled)
-        if self.wifi_transfer_enabled:
+    def set_wifi_transfer_connected(self, connected):
+        """Setup Connect/Disconnect: starts/stops the HTTP transfer server only."""
+        self.wifi_transfer_enabled = True
+        self.wifi_transfer_connected = bool(connected)
+        if self.wifi_transfer_connected:
+            self._wifi_server.stop()
             self._wifi_server.start()
         else:
             self._wifi_server.stop()
@@ -586,7 +622,7 @@ class RcPage1bApp:
         self.persist_wifi_transfer_state()
 
     def get_wifi_status_text(self):
-        if not self.wifi_transfer_enabled:
+        if not self.wifi_transfer_connected:
             return "off"
         status = self.wifi_status_text or self._wifi_server.last_status or "Waiting"
         if status in ("Connected", "Waiting") and not self.tree.get_children():
@@ -596,16 +632,12 @@ class RcPage1bApp:
         return status
 
     def callback_transfer(self):
-        """Show Wi-Fi transfer state (IP:port when enabled). Excel VBA pulls the last row."""
-        if not self.wifi_transfer_enabled:
-            status = "WiFi: off"
-        else:
-            wifi = self.get_wifi_status_text()
-            endpoint = f"{get_lan_ip_address()}:{WIFI_HTTP_PORT}"
-            status = f"WiFi: {wifi} {endpoint}"
-        self._flash_status_message(status)
+        """Show Wi-Fi transfer state and IP. Excel VBA pulls the last row."""
+        wifi = self.get_wifi_status_text()
+        status = f"WiFi: {wifi} {get_lan_ip_address()}"
+        self._flash_status_message(status, clear_ms=6000)
 
-    def _flash_status_message(self, text, clear_ms=1800):
+    def _flash_status_message(self, text, clear_ms=6000):
         try:
             self.message_txt.delete(1.0, "end")
             self.message_txt.insert(1.0, " " + str(text) + "\n")
@@ -825,18 +857,18 @@ class RcPage1bApp:
         
 
     def btn_setup(self):
+        # Keep Screen 1 mapped under Setup so the desktop never flashes.
         prepare_linux_kiosk_for_hide(self.balloonwindow, self.entry1_)
-        try:
-            self.balloonwindow.withdraw()
-        except tk.TclError:
-            pass
         setup_win = RcSetupPage2App(self.cd, self.cv, self, self.master)
-        setup_win.run()
+        setup_win.run()  # wait_window; keeps Screen 1 mainloop alive
         try:
-            self.balloonwindow.deiconify()
+            self.balloonwindow.lift()
         except tk.TclError:
             pass
-        prime_linux_kiosk_keyboard(self.balloonwindow)
+        try:
+            prime_linux_kiosk_keyboard(self.balloonwindow)
+        except tk.TclError:
+            pass
         try:
             self.entry1_.configure(state="normal")
         except tk.TclError:
