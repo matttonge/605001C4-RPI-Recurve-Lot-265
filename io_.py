@@ -2,7 +2,15 @@ import tkinter as tk
 from tkinter import ttk,Tk
 import pathlib
 import pygubu
-from app_config import APP_SOFTWARE_MODEL_REV, DATA_DIR_NAME, STARTUP_JSON_NAME
+from app_config import (
+    APP_SOFTWARE_MODEL_REV,
+    DATA_DIR_NAME,
+    STARTUP_JSON_NAME,
+    USB_TRANSFER_CONNECTED_DEFAULT,
+    USB_TRANSFER_ENABLED_DEFAULT,
+    WIFI_TRANSFER_CONNECTED_DEFAULT,
+    WIFI_TRANSFER_ENABLED_DEFAULT,
+)
 from conversions import CONVERSIONS
 import time
 import datetime
@@ -150,39 +158,75 @@ class json_cls:
     def __init__(self,master):
       self.m = master
 
-    def write_to_json(self,bal_pres,chuck_pres,bal_u,clamp_u,dia_u,pos_u,tree_file_name ):
+    def write_to_json(
+        self,
+        bal_pres,
+        chuck_pres,
+        bal_u,
+        clamp_u,
+        dia_u,
+        pos_u,
+        tree_file_name,
+        usb_transfer_enabled=None,
+        usb_transfer_connected=None,
+        wifi_transfer_enabled=None,
+        wifi_transfer_connected=None,
+    ):
+        # Preserve existing transfer flags when callers omit them (e.g. Setup Exit).
+        existing = {}
+        try:
+            with open(str(PROJECT_PATH / STARTUP_JSON_NAME), "r") as f:
+                existing = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            existing = {}
+
+        if usb_transfer_enabled is None:
+            usb_transfer_enabled = bool(
+                existing.get("usb_transfer_enabled", USB_TRANSFER_ENABLED_DEFAULT)
+            )
+        if usb_transfer_connected is None:
+            usb_transfer_connected = bool(
+                existing.get("usb_transfer_connected", USB_TRANSFER_CONNECTED_DEFAULT)
+            )
+        if wifi_transfer_enabled is None:
+            wifi_transfer_enabled = bool(
+                existing.get("wifi_transfer_enabled", WIFI_TRANSFER_ENABLED_DEFAULT)
+            )
+        if wifi_transfer_connected is None:
+            wifi_transfer_connected = bool(
+                existing.get("wifi_transfer_connected", WIFI_TRANSFER_CONNECTED_DEFAULT)
+            )
+
         data = {
-            'target_chuck_pressure': chuck_pres,
-            'target_balloon_pressure': bal_pres,
-            'cur_bal_units': bal_u,
-            'cur_clamp_units': clamp_u,
-            'cur_dia_units': dia_u,
-            'cur_pos_units': pos_u,
-            'cone_flip':I_O.cone_flip,
-            'tree_file_name': tree_file_name
+            "target_chuck_pressure": chuck_pres,
+            "target_balloon_pressure": bal_pres,
+            "cur_bal_units": bal_u,
+            "cur_clamp_units": clamp_u,
+            "cur_dia_units": dia_u,
+            "cur_pos_units": pos_u,
+            "cone_flip": I_O.cone_flip,
+            "tree_file_name": tree_file_name,
+            "usb_transfer_enabled": bool(usb_transfer_enabled),
+            "usb_transfer_connected": bool(usb_transfer_connected),
+            "wifi_transfer_enabled": bool(wifi_transfer_enabled),
+            "wifi_transfer_connected": bool(wifi_transfer_connected),
         }
-        """
-        Write data to a JSON file.
-        
-        Parameters:
-        data (dict): The data to be written to the file.
-        filename (str): The name of the file to write to.
-        """
-        with open(str(PROJECT_PATH / STARTUP_JSON_NAME), 'w') as f:
+        with open(str(PROJECT_PATH / STARTUP_JSON_NAME), "w") as f:
             json.dump(data, f, indent=4)
 
     def read_from_json(self):
         """
         Read data from a JSON file.
-        
-        Parameters:
-        filename (str): The name of the file to read from.
-        
+
         Returns:
         dict: The data read from the file.
         """
-        with open(str(PROJECT_PATH / STARTUP_JSON_NAME), 'r') as f:
+        with open(str(PROJECT_PATH / STARTUP_JSON_NAME), "r") as f:
             data = json.load(f)
-            I_O.cone_flip = bool(data.get('cone_flip', False))
+            I_O.cone_flip = bool(data.get("cone_flip", False))
+        data.setdefault("usb_transfer_enabled", USB_TRANSFER_ENABLED_DEFAULT)
+        data.setdefault("usb_transfer_connected", USB_TRANSFER_CONNECTED_DEFAULT)
+        data.setdefault("wifi_transfer_enabled", WIFI_TRANSFER_ENABLED_DEFAULT)
+        data.setdefault("wifi_transfer_connected", WIFI_TRANSFER_CONNECTED_DEFAULT)
         return data
 

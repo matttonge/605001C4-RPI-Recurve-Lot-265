@@ -1,3 +1,4 @@
+import os
 import serial
 import time
 import struct
@@ -14,7 +15,17 @@ from app_config import (
     POS_STALE_SEC,
     DIA_STALE_SEC,
 )
-import platform 
+import platform
+
+
+def resolve_serial_port():
+    """Port for Pico telemetry. Override with env RECURVE_SERIAL_PORT (e.g. /dev/ttyACM0)."""
+    override = os.environ.get("RECURVE_SERIAL_PORT", "").strip()
+    if override:
+        return override
+    if platform.system() == "Windows":
+        return SERIAL_WINDOWS_PORT
+    return SERIAL_LINUX_PORT 
 
 TELEMETRY_FORMAT = 'fffbb13sbfbb10s'
 TELEMETRY_PACKET_SIZE = struct.calcsize(TELEMETRY_FORMAT)
@@ -88,20 +99,13 @@ class COM_DATA:
         self.master=master
         self.cvrt = CONVERSIONS()
 
-        #print(platform.system()) 
-        if (platform.system()=="Windows"):  
-            self.ser = serial.Serial( port=SERIAL_WINDOWS_PORT,
-            #self.ser = serial.Serial('/dev/ttyUSB0',
-                           baudrate=SERIAL_BAUDRATE,
-                           parity=serial.PARITY_NONE,
-                           stopbits=serial.STOPBITS_ONE
-                           )
-        else:
-            self.ser = serial.Serial(SERIAL_LINUX_PORT,
-                           baudrate=SERIAL_BAUDRATE,
-                           parity=serial.PARITY_NONE,
-                           stopbits=serial.STOPBITS_ONE
-                           )
+        port = resolve_serial_port()
+        self.ser = serial.Serial(
+            port=port,
+            baudrate=SERIAL_BAUDRATE,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+        )
 
         self.serial_run = True
         self._last_valid_pos_time = None

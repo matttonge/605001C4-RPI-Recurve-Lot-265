@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+venv310/
+.venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# App runtime / local scratch
+logs/
+*.bak*
+Data_Files/*.bak*
+
+# Editor / IDE
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*~
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+
+# Local captures / scratch
+Capture.PNG

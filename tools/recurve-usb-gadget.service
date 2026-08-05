@@ -1,0 +1,15 @@
+[Unit]
+Description=Recurve USB CDC ACM serial gadget (g_serial)
+Documentation=file:///home/rp/Desktop/Recurve/docs/usb_com_excel_transfer.md
+After=systemd-modules-load.service
+Before=bluetooth.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/sbin/modprobe dwc2
+ExecStart=/sbin/modprobe g_serial
+ExecStop=/sbin/modprobe -r g_serial
+
+[Install]
+WantedBy=multi-user.target

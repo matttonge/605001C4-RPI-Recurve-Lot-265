@@ -1,0 +1,6 @@
+# Python deps for the Recurve host GUI (Pi / Windows / Ubuntu).
+#   python3 -m venv venv && venv/bin/pip install -r requirements.txt
+# tkinter is NOT pip-installable — use the OS package (Ubuntu: python3-tk).
+pygubu
+pyserial
+openpyxl
