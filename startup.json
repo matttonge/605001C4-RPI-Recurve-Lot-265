@@ -1,14 +1,14 @@
 {
-    "target_chuck_pressure": 120.0,
-    "target_balloon_pressure": 20.0,
-    "cur_bal_units": "psi",
+    "target_chuck_pressure": 30.0,
+    "target_balloon_pressure": 72.519,
+    "cur_bal_units": "bar",
     "cur_clamp_units": "psi",
     "cur_dia_units": "mm",
     "cur_pos_units": "mm",
-    "cone_flip": 1,
+    "cone_flip": false,
     "tree_file_name": "Test",
     "usb_transfer_enabled": false,
     "usb_transfer_connected": false,
-    "wifi_transfer_enabled": false,
-    "wifi_transfer_connected": false
+    "wifi_transfer_enabled": true,
+    "wifi_transfer_connected": true
 }

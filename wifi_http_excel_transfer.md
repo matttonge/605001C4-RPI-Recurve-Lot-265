@@ -1,8 +1,8 @@
 # Wi-Fi HTTP + VBA Excel Transfer (Bass-320) — demo
 
 Demo build: **Wi-Fi only**. USB Excel transfer UI and the Excel USB button are hidden
-(hardware not required for the demo). Setup shows **Excel Transfer** radios:
-**On** = HTTP server running, **Off** = stopped.
+(hardware not required for the demo). Setup shows an **Excel Transfer** checkbox:
+checked = **Enabled** (HTTP server on), unchecked = **Disabled**.
 
 ## Architecture
 
@@ -18,7 +18,7 @@ OS Wi-Fi stays up; Disconnect only stops the HTTP transfer server.
 ## Setup (Pi)
 
 1. Ensure the Pi is on the same Wi-Fi/LAN as the PC.
-2. Recurve → Setup → set **Excel Transfer** to **On**.
+2. Recurve → Setup → check **Excel Transfer** (**Enabled**).
 3. On the main screen, press **Transfer** to see `WiFi: <state> <ip>`
    (status stays ~6 seconds so you can read the IP). The IP prefers **Wi-Fi
    (`wlan0`)** when available, then falls back to ethernet.

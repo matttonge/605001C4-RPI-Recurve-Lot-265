@@ -8,9 +8,14 @@ from __future__ import annotations
 
 import socket
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Callable, Optional
 from urllib.parse import urlparse
+
+# Re-enable after Setup checkbox can race the prior socket close (EADDRINUSE).
+_BIND_ATTEMPTS = 15
+_BIND_RETRY_SEC = 0.1
 
 from app_config import WIFI_HTTP_HOST, WIFI_HTTP_PORT
 from bass320_transfer import (
@@ -19,8 +24,52 @@ from bass320_transfer import (
 )
 
 
+def _list_netifaces() -> list:
+    try:
+        return [name for _idx, name in socket.if_nameindex()]
+    except (OSError, AttributeError):
+        return ["wlan0", "eth0"]
+
+
+def _is_wifi_iface(name: str) -> bool:
+    n = (name or "").lower()
+    return n.startswith("wlan") or n.startswith("wlp") or n.startswith("wl")
+
+
+def _ipv4_for_iface(iface: str) -> Optional[str]:
+    """Return IPv4 for a named interface (Linux ioctl); None if unavailable."""
+    try:
+        import fcntl
+        import struct
+    except ImportError:
+        return None
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            ifreq = struct.pack("256s", iface[:15].encode("utf-8"))
+            # SIOCGIFADDR
+            res = fcntl.ioctl(sock.fileno(), 0x8915, ifreq)
+            ip = socket.inet_ntoa(res[20:24])
+        finally:
+            sock.close()
+        if ip and not ip.startswith("127."):
+            return ip
+    except OSError:
+        return None
+    return None
+
+
 def get_lan_ip_address() -> str:
-    """Best-effort LAN IPv4 for status display (not the bind address)."""
+    """Best-effort IPv4 for Transfer status / Excel BMS IP (not the bind address).
+
+    Demo preference: Wi-Fi (wlan*) first so customer-LAN demos without ethernet
+    show the correct address; fall back to default-route / any non-loopback IPv4.
+    """
+    for name in _list_netifaces():
+        if _is_wifi_iface(name):
+            ip = _ipv4_for_iface(name)
+            if ip:
+                return ip
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
@@ -92,8 +141,26 @@ class WifiHttpTransferServer:
             return format_err_response(str(exc) or "handler error")
 
     def start(self) -> None:
+        """Start the HTTP server. Safe to call after stop (Setup re-enable)."""
         with self._lock:
-            if self._thread is not None and self._thread.is_alive():
+            if (
+                self._running
+                and self._thread is not None
+                and self._thread.is_alive()
+                and self._httpd is not None
+            ):
+                return
+            need_stop = self._thread is not None and self._thread.is_alive()
+        # Tear down any half-dead listener before binding again.
+        if need_stop:
+            self.stop()
+        with self._lock:
+            if (
+                self._running
+                and self._thread is not None
+                and self._thread.is_alive()
+                and self._httpd is not None
+            ):
                 return
             self._running = True
             self._set_status("Waiting")
@@ -114,12 +181,8 @@ class WifiHttpTransferServer:
                 httpd.shutdown()
             except Exception:
                 pass
-            try:
-                httpd.server_close()
-            except Exception:
-                pass
         if thread is not None and thread.is_alive():
-            thread.join(timeout=2.0)
+            thread.join(timeout=5.0)
         with self._lock:
             self._httpd = None
             self._thread = None
@@ -127,6 +190,7 @@ class WifiHttpTransferServer:
 
     def _run(self) -> None:
         outer = self
+        httpd: Optional[ThreadingHTTPServer] = None
 
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, format, *args):  # noqa: A003
@@ -159,17 +223,33 @@ class WifiHttpTransferServer:
                     outer._set_status("Connected")
 
         try:
-            httpd = ThreadingHTTPServer((self.host, self.port), Handler)
+            for _attempt in range(_BIND_ATTEMPTS):
+                if not self._running:
+                    return
+                try:
+                    httpd = ThreadingHTTPServer((self.host, self.port), Handler)
+                    break
+                except OSError:
+                    time.sleep(_BIND_RETRY_SEC)
+            if httpd is None:
+                if self._running:
+                    self._set_status("Waiting")
+                return
             with self._lock:
                 self._httpd = httpd
             self._set_status("Connected")
             httpd.serve_forever(poll_interval=0.5)
-        except OSError:
-            if self._running:
-                self._set_status("Waiting")
         finally:
+            if httpd is not None:
+                try:
+                    httpd.server_close()
+                except Exception:
+                    pass
             with self._lock:
-                self._httpd = None
-            if self._running:
-                self._set_status("Wi-Fi off")
+                if self._httpd is httpd:
+                    self._httpd = None
+            was_running = self._running
             self._running = False
+            # Bind failure leaves status as Waiting; don't clobber it to off.
+            if was_running and httpd is not None:
+                self._set_status("Wi-Fi off")

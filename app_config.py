@@ -32,7 +32,7 @@ USB_TRANSFER_CONNECTED_DEFAULT = False
 # Wi-Fi HTTP Excel transfer (Bass-320). Demo UI is Wi-Fi-only; USB transfer is hidden.
 WIFI_HTTP_HOST = "0.0.0.0"
 WIFI_HTTP_PORT = 8765
-WIFI_TRANSFER_ENABLED_DEFAULT = False
+WIFI_TRANSFER_ENABLED_DEFAULT = True
 WIFI_TRANSFER_CONNECTED_DEFAULT = False
 
 # Deprecated: Bluetooth HID keyboard emulator was previously used to type into Excel.
