@@ -22,19 +22,23 @@ venv/bin/python -m unittest test_conversions.py
 venv/bin/python -m unittest test_wifi_http_transfer test_bass320_transfer test_usb_com_transfer
 ```
 
-### Run on Ubuntu (dev)
+### Run on Ubuntu / Windows (dev)
 
-Do **not** use `start_recurve.sh` here — it hardcodes Pi paths and kiosk display setup.
+Do **not** use `start_recurve.sh` on Ubuntu — it hardcodes Pi paths and kiosk display setup.
+
+On Ubuntu/Windows/Jetson the UI opens as a **movable 1024×600** window titled "Recurve"
+(not borderless kiosk). Raspberry Pi still auto-detects kiosk mode. Override with
+`RECURVE_KIOSK=1` (force kiosk) or `RECURVE_KIOSK=0` (force windowed).
 
 ```bash
 # Pico/FTDI attached as /dev/ttyUSB0 (or set RECURVE_SERIAL_PORT):
 DISPLAY=:1 venv/bin/python Run_Screen_1b.py
 
 # No hardware: create a virtual serial endpoint first
-sudo socat -d -d \
-  PTY,raw,echo=0,link=/dev/ttyUSB0,mode=666 \
-  PTY,raw,echo=0,link=/tmp/ttyPICO,mode=666 &
-DISPLAY=:1 venv/bin/python Run_Screen_1b.py
+socat -d -d \
+  PTY,raw,echo=0,link=/tmp/recurve_ttyUSB0,mode=666 \
+  PTY,raw,echo=0,link=/tmp/recurve_ttyPICO,mode=666 &
+RECURVE_SERIAL_PORT=/tmp/recurve_ttyUSB0 DISPLAY=:1 venv/bin/python Run_Screen_1b.py
 ```
 
 If the device shows up as `/dev/ttyACM0` instead of `ttyUSB0`:

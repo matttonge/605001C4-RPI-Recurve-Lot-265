@@ -1,5 +1,6 @@
 """Shared placement for Screen 2 touch numeric keypads."""
 
+import os
 import sys
 import tkinter as tk
 
@@ -14,9 +15,60 @@ _KIOSK_W = 1024
 _KIOSK_H = 600
 
 
+def use_kiosk_mode():
+    """True on Raspberry Pi kiosk; False on Ubuntu/Windows/Jetson desktop development.
+
+    Override with RECURVE_KIOSK=1|0.
+    """
+    env = os.environ.get("RECURVE_KIOSK", "").strip().lower()
+    if env in ("1", "true", "yes", "on"):
+        return True
+    if env in ("0", "false", "no", "off"):
+        return False
+    try:
+        with open("/proc/device-tree/model", "rb") as f:
+            model = f.read().decode("utf-8", "ignore")
+        if "Raspberry Pi" in model:
+            return True
+    except OSError:
+        pass
+    return False
+
+
+def _configure_dev_window(window, target_w=_KIOSK_W, target_h=_KIOSK_H):
+    """Movable decorated 1024x600 window for Ubuntu / Windows development."""
+    try:
+        window.overrideredirect(False)
+        window.title("Recurve")
+        window.configure(takefocus=True)
+        window.resizable(False, False)
+        window.geometry(f"{target_w}x{target_h}")
+        window.minsize(target_w, target_h)
+        window.maxsize(target_w, target_h)
+        window.update_idletasks()
+    except tk.TclError:
+        pass
+
+    def _reposition():
+        try:
+            window.update_idletasks()
+            window.overrideredirect(False)
+            # Keep size fixed; do not force +0+0 so the user can move the window.
+            window.geometry(f"{target_w}x{target_h}")
+        except tk.TclError:
+            pass
+
+    window.after_idle(_reposition)
+
+
 def _force_linux_wm_borderless(window, target_w=_KIOSK_W, target_h=_KIOSK_H):
     """Unconditionally restore borderless kiosk geometry (ignore decoration refcount)."""
     global _linux_wm_decorated, _linux_wm_decorated_window
+    if not use_kiosk_mode():
+        _linux_wm_decorated = 0
+        _linux_wm_decorated_window = None
+        _configure_dev_window(window, target_w, target_h)
+        return
     try:
         window.overrideredirect(True)
         window.title("")
@@ -29,15 +81,16 @@ def _force_linux_wm_borderless(window, target_w=_KIOSK_W, target_h=_KIOSK_H):
 
 
 def force_linux_kiosk_layout(window, target_w=_KIOSK_W, target_h=_KIOSK_H):
-    """Clear keyboard WM state and restore borderless kiosk geometry."""
+    """Clear keyboard WM state and restore window layout (kiosk or desktop)."""
     remove_keypad_keyboard()
-    _force_linux_wm_borderless(window, target_w, target_h)
+    if use_kiosk_mode():
+        _force_linux_wm_borderless(window, target_w, target_h)
     configure_linux_kiosk_window(window, target_w, target_h)
 
 
 def release_linux_keyboard_field(widget):
     """Force-release a keyboard-enabled field (e.g. lot number cb before Setup)."""
-    if not sys.platform.startswith("linux"):
+    if not sys.platform.startswith("linux") or not use_kiosk_mode():
         return
     release = getattr(widget, "_release_linux_keyboard", None)
     if release is not None:
@@ -70,7 +123,10 @@ def prime_linux_kiosk_keyboard(window, target_w=_KIOSK_W, target_h=_KIOSK_H):
 
 
 def configure_linux_kiosk_window(window, target_w=_KIOSK_W, target_h=_KIOSK_H):
-    """Borderless kiosk window; keyboard uses temporary decorations while keypad is open."""
+    """Configure main Screen 1/2 window: Pi kiosk or movable 1024x600 on desktop OS."""
+    if not use_kiosk_mode():
+        _configure_dev_window(window, target_w, target_h)
+        return
     if not sys.platform.startswith("linux"):
         return
     try:
@@ -95,7 +151,7 @@ def configure_linux_kiosk_window(window, target_w=_KIOSK_W, target_h=_KIOSK_H):
 def _linux_keypad_enter(window):
     """Briefly allow WM decorations so Pi/X11 delivers USB key events."""
     global _linux_wm_decorated, _linux_wm_decorated_window
-    if not sys.platform.startswith("linux"):
+    if not sys.platform.startswith("linux") or not use_kiosk_mode():
         return
     if _linux_wm_decorated == 0:
         _linux_wm_decorated_window = window
@@ -111,7 +167,7 @@ def _linux_keypad_enter(window):
 
 def _linux_keypad_leave(window):
     global _linux_wm_decorated, _linux_wm_decorated_window
-    if not sys.platform.startswith("linux"):
+    if not sys.platform.startswith("linux") or not use_kiosk_mode():
         return
     if _linux_wm_decorated <= 0:
         return
@@ -130,7 +186,7 @@ def _linux_keypad_leave(window):
 
 def install_linux_keyboard_field(widget):
     """Enable USB keyboard typing in a field on borderless Pi windows."""
-    if not sys.platform.startswith("linux"):
+    if not sys.platform.startswith("linux") or not use_kiosk_mode():
         return
 
     top = widget.winfo_toplevel()
@@ -184,7 +240,13 @@ def install_linux_keyboard_field(widget):
 
 
 def configure_linux_app_root(root):
-    """Keep Tk root mapped but invisible so the focus chain can receive keys."""
+    """Keep Tk root mapped but invisible so the focus chain can receive keys (Pi kiosk)."""
+    if not use_kiosk_mode():
+        try:
+            root.withdraw()
+        except tk.TclError:
+            pass
+        return
     if not sys.platform.startswith("linux"):
         try:
             root.withdraw()
