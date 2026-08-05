@@ -101,6 +101,12 @@ class RcPage1bApp:
 
         # Main widget
         self.balloonwindow = builder.get_object("SetupFrame", master)
+        # tk.Text setgrid must stay off: with WM decorations it forces a huge
+        # character-grid window size (seen as ~9k x 11k on Ubuntu/Windows).
+        try:
+            builder.get_object("message_txt").configure(setgrid=False)
+        except Exception:
+            pass
         configure_linux_kiosk_window(self.balloonwindow)
         # Borderless (overrideredirect) Toplevel must accept focus, otherwise
         # USB keyboard events have nowhere to be delivered. Match Screen 2's

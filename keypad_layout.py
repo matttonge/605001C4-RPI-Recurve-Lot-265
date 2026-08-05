@@ -37,28 +37,31 @@ def use_kiosk_mode():
 
 def _configure_dev_window(window, target_w=_KIOSK_W, target_h=_KIOSK_H):
     """Movable decorated 1024x600 window for Ubuntu / Windows development."""
-    try:
-        window.overrideredirect(False)
-        window.title("Recurve")
-        window.configure(takefocus=True)
-        window.resizable(False, False)
-        window.geometry(f"{target_w}x{target_h}")
-        window.minsize(target_w, target_h)
-        window.maxsize(target_w, target_h)
-        window.update_idletasks()
-    except tk.TclError:
-        pass
+    geom = f"{target_w}x{target_h}"
 
-    def _reposition():
+    def _apply():
         try:
-            window.update_idletasks()
             window.overrideredirect(False)
-            # Keep size fixed; do not force +0+0 so the user can move the window.
-            window.geometry(f"{target_w}x{target_h}")
+            window.title("Recurve")
+            window.configure(takefocus=True)
+            window.resizable(False, False)
+            window.minsize(target_w, target_h)
+            window.maxsize(target_w, target_h)
+            window.geometry(geom)
+            window.update_idletasks()
         except tk.TclError:
             pass
 
-    window.after_idle(_reposition)
+    try:
+        window.withdraw()
+        _apply()
+        window.deiconify()
+        window.lift()
+        _apply()
+    except tk.TclError:
+        _apply()
+
+    window.after_idle(_apply)
 
 
 def _force_linux_wm_borderless(window, target_w=_KIOSK_W, target_h=_KIOSK_H):

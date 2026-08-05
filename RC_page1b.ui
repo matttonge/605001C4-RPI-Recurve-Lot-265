@@ -365,7 +365,7 @@ Balloon</property>
             <property name="font">{Arial} 12 {}</property>
             <property name="height">10</property>
             <property name="relief">flat</property>
-            <property name="setgrid">true</property>
+            <property name="setgrid">false</property>
             <property name="state">normal</property>
             <property name="tabstyle">wordprocessor</property>
             <property name="width">50</property>
