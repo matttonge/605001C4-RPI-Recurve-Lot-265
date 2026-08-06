@@ -58,8 +58,16 @@ cd /home/rp/Desktop/Recurve
 Serial telemetry expects `SERIAL_LINUX_PORT` (`/dev/ttyUSB0` by default). The app
 opens that port eagerly at startup.
 
+### Multi-repo Cursor workspace
+
+Open both host + Pico trees together:
+
+`/home/matt/Documents/SB-120psi-System/SB-120psi-System.code-workspace`
+
+(or **File → Open Workspace from File…** and pick that file).
+
 ### Git / deploy
 
-- Source of truth: GitHub (`sync/pi-production` imported the shop Pi tree).
-- Pi checkout: `/home/rp/Desktop/Recurve` tracks git; update with `git pull`.
+- Source of truth: GitHub (`main` includes the Pi production import + Ubuntu windowed-dev support).
+- Pi checkout: `/home/rp/Desktop/Recurve` tracks git; update with `git pull` on `main` (or the deploy branch).
 - Do not leave the only copy of a change on the Pi disk.
