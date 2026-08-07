@@ -25,7 +25,7 @@ from run_auto import rs_auto
 
 from screen_2_app import RcSetupPage2App
 from io_ import I_O,json_cls
-from wifi_http_transfer import WifiHttpTransferServer, get_lan_ip_address
+from wifi_http_transfer import WifiHttpTransferServer, format_lan_ip_status
 from touch_numeric_keypad import TouchNumericKeypad
 from inline_numeric_keypad import InlineNumericKeypad
 from touch_alpha_keypad import TouchAlphaKeypad
@@ -640,7 +640,7 @@ class RcPage1bApp:
     def callback_transfer(self):
         """Show Wi-Fi transfer state and IP. Excel VBA pulls the last row."""
         wifi = self.get_wifi_status_text()
-        status = f"WiFi: {wifi} {get_lan_ip_address()}"
+        status = f"WiFi: {wifi} {format_lan_ip_status()}"
         self._flash_status_message(status, clear_ms=6000)
 
     def _flash_status_message(self, text, clear_ms=6000):

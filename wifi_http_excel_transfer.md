@@ -20,8 +20,9 @@ OS Wi-Fi stays up; Disconnect only stops the HTTP transfer server.
 1. Ensure the Pi is on the same Wi-Fi/LAN as the PC.
 2. Recurve → Setup → check **Excel Transfer** (**Enabled**).
 3. On the main screen, press **Transfer** to see `WiFi: <state> <ip>`
-   (status stays ~6 seconds so you can read the IP). The IP prefers **Wi-Fi
-   (`wlan0`)** when available, then falls back to ethernet.
+   (status stays ~6 seconds so you can read the IP). The first IP is **Wi-Fi
+   (`wlan0`)** when available; other active IPv4s (e.g. ethernet DHCP) follow
+   separated by ` -- ` (example: `WiFi: Connected 192.168.68.64 -- 192.168.1.186`).
 
 Smoke test from the PC:
 

@@ -59,17 +59,18 @@ def _ipv4_for_iface(iface: str) -> Optional[str]:
     return None
 
 
-def get_lan_ip_address() -> str:
-    """Best-effort IPv4 for Transfer status / Excel BMS IP (not the bind address).
+def _dedupe_preserve_order(ips: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for ip in ips:
+        if ip not in seen:
+            seen.add(ip)
+            out.append(ip)
+    return out
 
-    Demo preference: Wi-Fi (wlan*) first so customer-LAN demos without ethernet
-    show the correct address; fall back to default-route / any non-loopback IPv4.
-    """
-    for name in _list_netifaces():
-        if _is_wifi_iface(name):
-            ip = _ipv4_for_iface(name)
-            if ip:
-                return ip
+
+def _fallback_lan_ip_address() -> Optional[str]:
+    """Default-route / hostname IPv4 when no iface has an address."""
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
@@ -89,6 +90,47 @@ def get_lan_ip_address() -> str:
                 return ip
     except OSError:
         pass
+    return None
+
+
+def list_lan_ip_addresses() -> list[str]:
+    """Active non-loopback IPv4s: Wi-Fi (wlan*) first, then other interfaces."""
+    wifi_ips: list[str] = []
+    other_ips: list[str] = []
+    for name in _list_netifaces():
+        ip = _ipv4_for_iface(name)
+        if not ip:
+            continue
+        if _is_wifi_iface(name):
+            wifi_ips.append(ip)
+        else:
+            other_ips.append(ip)
+    ips = _dedupe_preserve_order(wifi_ips + other_ips)
+    if ips:
+        return ips
+    fallback = _fallback_lan_ip_address()
+    if fallback:
+        return [fallback]
+    return []
+
+
+def format_lan_ip_status() -> str:
+    """Primary Wi-Fi IP, then other active IPv4s separated by ' -- '."""
+    ips = list_lan_ip_addresses()
+    if not ips:
+        return "0.0.0.0"
+    return " -- ".join(ips)
+
+
+def get_lan_ip_address() -> str:
+    """Best-effort primary IPv4 for Excel BMS IP (not the bind address).
+
+    Demo preference: Wi-Fi (wlan*) first so customer-LAN demos without ethernet
+    show the correct address; fall back to default-route / any non-loopback IPv4.
+    """
+    ips = list_lan_ip_addresses()
+    if ips:
+        return ips[0]
     return "0.0.0.0"
 
 

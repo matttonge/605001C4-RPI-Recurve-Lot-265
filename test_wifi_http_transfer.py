@@ -5,7 +5,12 @@ from unittest.mock import MagicMock, patch
 
 from http.server import ThreadingHTTPServer
 
-from wifi_http_transfer import WifiHttpTransferServer, get_lan_ip_address
+from wifi_http_transfer import (
+    WifiHttpTransferServer,
+    format_lan_ip_status,
+    get_lan_ip_address,
+    list_lan_ip_addresses,
+)
 
 
 class TestWifiHttpTransferServer(unittest.TestCase):
@@ -48,6 +53,42 @@ class TestWifiHttpTransferServer(unittest.TestCase):
             return_value=["lo", "eth0", "wlan0"],
         ), patch("wifi_http_transfer._ipv4_for_iface", side_effect=fake_ip):
             self.assertEqual(get_lan_ip_address(), "192.168.68.64")
+
+    def test_list_lan_ip_addresses_wifi_first_then_others(self):
+        def fake_ip(name):
+            return {"wlan0": "192.168.68.64", "eth0": "192.168.1.186"}.get(name)
+
+        with patch(
+            "wifi_http_transfer._list_netifaces",
+            return_value=["lo", "eth0", "wlan0"],
+        ), patch("wifi_http_transfer._ipv4_for_iface", side_effect=fake_ip):
+            self.assertEqual(
+                list_lan_ip_addresses(),
+                ["192.168.68.64", "192.168.1.186"],
+            )
+
+    def test_format_lan_ip_status_multiple(self):
+        def fake_ip(name):
+            return {"wlan0": "192.168.68.64", "eth0": "192.168.1.186"}.get(name)
+
+        with patch(
+            "wifi_http_transfer._list_netifaces",
+            return_value=["lo", "eth0", "wlan0"],
+        ), patch("wifi_http_transfer._ipv4_for_iface", side_effect=fake_ip):
+            self.assertEqual(
+                format_lan_ip_status(),
+                "192.168.68.64 -- 192.168.1.186",
+            )
+
+    def test_format_lan_ip_status_single_no_separator(self):
+        def fake_ip(name):
+            return {"wlan0": "192.168.68.64"}.get(name)
+
+        with patch(
+            "wifi_http_transfer._list_netifaces",
+            return_value=["lo", "wlan0"],
+        ), patch("wifi_http_transfer._ipv4_for_iface", side_effect=fake_ip):
+            self.assertEqual(format_lan_ip_status(), "192.168.68.64")
 
     def _probe(self, port: int) -> str:
         try:
