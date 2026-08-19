@@ -68,6 +68,18 @@ Open both host + Pico trees together:
 
 ### Git / deploy
 
-- Source of truth: GitHub (`main` includes the Pi production import + Ubuntu windowed-dev support).
-- Pi checkout: `/home/rp/Desktop/Recurve` tracks git; update with `git pull` on `main` (or the deploy branch).
+- Source of truth: Cursor Origin (`origin.cursor.com`, remote `origin`). `main` includes the Pi production import + Ubuntu windowed-dev support.
+- GitHub is frozen as remote `github` (fetch only; push disabled). Do not push to GitHub.
+- Pi checkout: `/home/rp/Desktop/Recurve` tracks git; update with `git pull` on `main` from `origin` after migrating that clone (see below).
 - Do not leave the only copy of a change on the Pi disk.
+
+**Other clones (Pi, Windows):** on each checkout, run once:
+
+```bash
+origin auth login   # browser sign-in; once per machine
+git remote rename origin github
+git remote set-url --push github DISABLED
+git remote add origin https://origin.cursor.com/cki-mft/605001C4-RPI-Recurve-Lot-265.git
+git fetch origin
+git branch --set-upstream-to=origin/main main
+```
