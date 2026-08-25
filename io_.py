@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk,Tk
 import pathlib
 import pygubu
+from typing import Any, Protocol
 from app_config import (
     APP_SOFTWARE_MODEL_REV,
     DATA_DIR_NAME,
@@ -22,6 +23,19 @@ import platform
 import os
 
 PROJECT_PATH = pathlib.Path(__file__).parent
+
+
+class _LotWorkbookHost(Protocol):
+    """Screen-1 app surface used by I_O lot load/save helpers (unbound calls)."""
+
+    entry1_: Any
+    tree: Any
+
+    def clear_treeview(self, tree: Any) -> None: ...
+    def setup_tree(self) -> None: ...
+    def setup_pic_Labels(self) -> None: ...
+    def clear_params(self) -> None: ...
+
 
 class I_O:
     
@@ -46,52 +60,55 @@ class I_O:
         col1 = str(header_row[1] or "").strip().lower()
         return col1.startswith("prox")
 
-    def load_xl_files(self,lot_number, treeview):
+    @staticmethod
+    def load_xl_files(host: _LotWorkbookHost, lot_number, treeview):
         workbook = openpyxl.load_workbook(I_O.path_1+lot_number+".xlsx")
         sheet= workbook.active
         list_values = list(sheet.values)
         lk=list_values[0] if list_values else ()
         I_O.cone_flip = bool(I_O.cone_flip_from_excel_headers(lk))
-        self.clear_treeview(treeview)
+        host.clear_treeview(treeview)
        # for col_name in list_values[0]:
        #     treeview.heading(col_name, text=col_name)
-        self.setup_tree()
+        host.setup_tree()
         for item in treeview.get_children():
                 treeview.delete(item)            
         for value_tuple in list_values[1:]:
             treeview.insert('', tk.END, values=value_tuple)
         # Keep diagram / instruction labels aligned with the loaded lot orientation.
-        if hasattr(self, "setup_pic_Labels"):
-            self.setup_pic_Labels()
-            if hasattr(self, "clear_params"):
-                self.clear_params()
+        if hasattr(host, "setup_pic_Labels"):
+            host.setup_pic_Labels()
+            if hasattr(host, "clear_params"):
+                host.clear_params()
 
        
        
-    def load_lot_number(self):
+    @staticmethod
+    def load_lot_number(host: _LotWorkbookHost):
         directory = PROJECT_PATH / DATA_DIR_NAME
             # Get all filenames with .xlsx extension in the specified directory
         File_Names = [filename for filename in os.listdir(directory) if filename.endswith('.xlsx')]
         
         # Stripping file extensions
-        self.entry1_['value'] = [os.path.splitext(filename)[0] for filename in File_Names]
+        host.entry1_['value'] = [os.path.splitext(filename)[0] for filename in File_Names]
 
 
 
 
-    def write_xl_file(self, lot_num):
+    @staticmethod
+    def write_xl_file(host: _LotWorkbookHost, lot_num):
         # Persist current Prox Left orientation in the Excel header row.
-        if hasattr(self, "setup_tree"):
-            self.setup_tree()
+        if hasattr(host, "setup_tree"):
+            host.setup_tree()
 
         workbook = openpyxl.Workbook()
         sheet= workbook.active
         header_text=[]
-        for column in self.tree["columns"]:
-            header_text.append(self.tree.heading(column)["text"])
+        for column in host.tree["columns"]:
+            header_text.append(host.tree.heading(column)["text"])
         sheet.append(header_text)   
-        for child_item in self.tree.get_children():
-            row_values = list(self.tree.item(child_item)["values"])
+        for child_item in host.tree.get_children():
+            row_values = list(host.tree.item(child_item)["values"])
             i=0
             for value in row_values:
                 try: 
@@ -117,7 +134,7 @@ class I_O:
                     tmp_file_path = I_O.path_1+str(lot_num)+".bak"+str(n)
                 os.rename(file_path, tmp_file_path)        
             workbook.save(file_path)
-        I_O.load_lot_number(self)
+        I_O.load_lot_number(host)
 
     @staticmethod
     def _format_lot_worksheet(sheet):

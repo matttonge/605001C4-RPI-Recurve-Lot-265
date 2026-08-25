@@ -30,6 +30,12 @@ def resolve_serial_port():
 TELEMETRY_FORMAT = 'fffbb13sbfbb10s'
 TELEMETRY_PACKET_SIZE = struct.calcsize(TELEMETRY_FORMAT)
 
+def _is_missing_serial_port(exc):
+    if getattr(exc, "errno", None) == 2:
+        return True
+    text = str(exc).lower()
+    return "no such file" in text or "file not found" in text
+
 """
 current_balloon_pressure = float(0.0)
 current_clamp_pressure   = float(0.1)
@@ -98,43 +104,82 @@ class COM_DATA:
         
         self.master=master
         self.cvrt = CONVERSIONS()
-
-        port = resolve_serial_port()
-        self.ser = serial.Serial(
-            port=port,
-            baudrate=SERIAL_BAUDRATE,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-        )
-
+        self.ser = None
+        self._serial_warn_at = 0.0
         self.serial_run = True
         self._last_valid_pos_time = None
         self._last_valid_dia_time = None
         self._pressure_telemetry_seen = False
+        self._try_open_serial()
         self.t=threading.Thread(target = self.tick, daemon=True)
         self.t.start()
 
+    def _try_open_serial(self):
+        """Open Pico telemetry. Missing/unplugged port is normal on Ubuntu without hardware."""
+        if self.ser is not None and getattr(self.ser, "is_open", False):
+            return True
+        port = resolve_serial_port()
+        try:
+            self.ser = serial.Serial(
+                port=port,
+                baudrate=SERIAL_BAUDRATE,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+            )
+            print(f"[serial] opened {port}")
+            return True
+        except (serial.SerialException, OSError) as exc:
+            self.ser = None
+            now = time.time()
+            if _is_missing_serial_port(exc):
+                if self._serial_warn_at == 0.0:
+                    print(
+                        f"[serial] {port} not present (no Pico/FTDI). "
+                        "UI running; will connect when the device appears."
+                    )
+                    self._serial_warn_at = now
+            elif now - self._serial_warn_at >= 5.0:
+                print(f"[serial] waiting for {port}: {exc}")
+                self._serial_warn_at = now
+            return False
+
     def deinit(self):
         self.serial_run = False 
-        time.sleep(SERIAL_DEINIT_SLEEP_SEC)       
-        self.ser.close() 
+        time.sleep(SERIAL_DEINIT_SLEEP_SEC)
+        ser = self.ser
+        if ser is not None:
+            try:
+                ser.close()
+            except (serial.SerialException, OSError):
+                pass
+        self.ser = None 
          
     def set_master(self,master):
         self.master=master
 
+    @staticmethod
+    def _invoke_master(master, name, *args):
+        if master is None:
+            return
+        fn = getattr(master, name, None)
+        if callable(fn):
+            fn(*args)
+
     def _update_position(self):
-        if self.master is None:
+        master = self.master
+        if master is None:
             return
         t = self.cvrt.mit_val_to_position(COM_DATA.mitutoyo_val, "mm")
         if t is not None:
             self._last_valid_pos_time = time.time()
-            self.master.set_cur_pos(abs(t))
+            self._invoke_master(master, "set_cur_pos", abs(t))
 
     def _check_pos_stale(self):
-        if self.master is None or self._last_valid_pos_time is None:
+        master = self.master
+        if master is None or self._last_valid_pos_time is None:
             return
         if time.time() - self._last_valid_pos_time > POS_STALE_SEC:
-            self.master.set_cur_pos(None)
+            self._invoke_master(master, "set_cur_pos", None)
             self._last_valid_pos_time = None
 
     @staticmethod
@@ -144,25 +189,45 @@ class COM_DATA:
         return val >= 0
 
     def _update_diameter(self):
-        if self.master is None:
+        master = self.master
+        if master is None:
             return
         if self._is_valid_dia(COM_DATA.diameter_val):
             self._last_valid_dia_time = time.time()
-            self.master.set_cur_dia(COM_DATA.diameter_val)
+            self._invoke_master(master, "set_cur_dia", COM_DATA.diameter_val)
 
     def _check_dia_stale(self):
-        if self.master is None or self._last_valid_dia_time is None:
+        master = self.master
+        if master is None or self._last_valid_dia_time is None:
             return
         if time.time() - self._last_valid_dia_time > DIA_STALE_SEC:
-            self.master.set_cur_dia(None)
+            self._invoke_master(master, "set_cur_dia", None)
             self._last_valid_dia_time = None
 
     def _update_pressure(self):
-        if self.master is None or not self._pressure_telemetry_seen:
+        master = self.master
+        if master is None or not self._pressure_telemetry_seen:
             return
-        self.master.set_cur_press(COM_DATA.current_balloon_pressure)
-        self.master.set_cur_clamp_press(COM_DATA.current_clamp_pressure)
-    
+        self._invoke_master(master, "set_cur_press", COM_DATA.current_balloon_pressure)
+        self._invoke_master(master, "set_cur_clamp_press", COM_DATA.current_clamp_pressure)
+
+    def _push_state_to_master(self):
+        # Snapshot: Setup sets master=None while this thread is mid-packet.
+        master = self.master
+        if master is None:
+            return
+        self._update_pressure()
+        self._update_diameter()
+        self._update_position()
+        self._invoke_master(master, "set_cur_input_press", COM_DATA.current_input_pressure)
+        self._invoke_master(master, "set_cur_rt_chuck", COM_DATA.right_chuck_state)
+        self._invoke_master(master, "set_cur_lft_chuck", COM_DATA.left_chuck_state)
+        self._invoke_master(master, "set_cur_rt_clamp", COM_DATA.right_clamp_state)
+        self._invoke_master(master, "set_cur_lft_clamp", COM_DATA.left_clamp_state)
+        if COM_DATA.get_data:
+            self._invoke_master(master, "callback_get_data")
+            COM_DATA.get_data = False
+
     def uart0_send(self):
       #  buf=struct.pack('ffiiii', self.target_balloon_pressure, self.target_chuck_pressure, self.right_chuck,
       #                  self.left_chuck, self.zero_balloon_pressure, self.zero_chuck_pressure)
@@ -173,10 +238,13 @@ class COM_DATA:
                                                 COM_DATA.enable_balloon_cal, COM_DATA.zero_balloon_pressure, COM_DATA.scale_balloon_pressure, COM_DATA.balloon_cal_button, COM_DATA.balloon_reference_pressure, 
                                                 COM_DATA.enable_chuck_cal, COM_DATA.zero_chuck_pressure, COM_DATA.scale_chuck_pressure, COM_DATA.chuck_cal_button, COM_DATA.chuck_reference_pressure,
                                                 COM_DATA.mode, COM_DATA.right_clamp, COM_DATA.left_clamp)
+        if self.ser is None:
+            return
         try:
             self.ser.write(buf)
         except (serial.SerialException, OSError, TypeError) as exc:
             print(f"[serial] write error: {exc}")
+            self.ser = None
             return
       #  print(COM_DATA.target_balloon_pressure)
       #  print(buf)
@@ -202,11 +270,20 @@ class COM_DATA:
       
         while self.serial_run:
           #  print(str(self.ser.in_waiting))
+            if self.ser is None:
+                self._try_open_serial()
+                time.sleep(SERIAL_TICK_SLEEP_SEC)
+                continue
             try:
                 in_waiting = self.ser.in_waiting
-            except (serial.SerialException, OSError, TypeError) as exc:
+            except (serial.SerialException, OSError, TypeError, AttributeError) as exc:
                 # Seen on Linux when USB serial momentarily drops/invalidates.
                 print(f"[serial] in_waiting error: {exc}")
+                try:
+                    self.ser.close()
+                except Exception:
+                    pass
+                self.ser = None
                 time.sleep(0.25)
                 continue
 
@@ -242,20 +319,7 @@ class COM_DATA:
                 self._pressure_telemetry_seen = True
                 #print(buf)
                      
-                if(self.master != None):  
-                    self._update_pressure()
-                    self._update_diameter()
-
-                    self._update_position()
-                    if hasattr(self.master, "set_cur_input_press"):
-                        self.master.set_cur_input_press(COM_DATA.current_input_pressure)
-                    self.master.set_cur_rt_chuck(COM_DATA.right_chuck_state)
-                    self.master.set_cur_lft_chuck(COM_DATA.left_chuck_state)
-                    self.master.set_cur_rt_clamp(COM_DATA.right_clamp_state)
-                    self.master.set_cur_lft_clamp(COM_DATA.left_clamp_state)
-                    if(COM_DATA.get_data):
-                        self.master.callback_get_data()
-                        COM_DATA.get_data = False
+                self._push_state_to_master()
 
                 if(COM_DATA.right_chuck==2): 
                     COM_DATA.right_chuck= 0
