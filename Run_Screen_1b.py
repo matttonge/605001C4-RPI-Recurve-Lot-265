@@ -1,3 +1,4 @@
+import ensure_venv  # re-execs ./venv when launched with system Python
 import tkinter as tk
 from tkinter import ttk,Tk
 import pathlib

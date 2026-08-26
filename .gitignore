@@ -18,7 +18,9 @@ logs/
 Data_Files/*.bak*
 
 # Editor / IDE
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
 .idea/
 *.code-workspace
 *.swp
