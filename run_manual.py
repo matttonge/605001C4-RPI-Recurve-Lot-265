@@ -20,12 +20,12 @@ class Parameter:
     selected_param = None
     last_selected_param = None
     
-    def __init__( self, obj, name, master=None, pos=0.0, dia=0.0 ):
+    def __init__(self, obj, name, master=None, pos: float | None = 0.0, dia: float | None = 0.0):
         self.master = master
         self.name = name
         self.obj = obj
-        self.dia = dia
-        self.pos = pos
+        self.dia: float | None = dia
+        self.pos: float | None = pos
     
   
 class rs_manual:
