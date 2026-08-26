@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Recurve: Run_Screen_1b",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/Run_Screen_1b.py",
+            "python": "${workspaceFolder}/venv/bin/python",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": true,
+            "env": {
+                "DISPLAY": ":1",
+                "RECURVE_KIOSK": "0"
+            },
+            "windows": {
+                "python": "${workspaceFolder}/venv/Scripts/python.exe"
+            },
+            "linux": {
+                "python": "${workspaceFolder}/venv/bin/python"
+            },
+            "osx": {
+                "python": "${workspaceFolder}/venv/bin/python"
+            }
+        }
+    ]
+}

@@ -1,6 +1,4 @@
 {
   "venvPath": ".",
-  "venv": "venv",
-  "pythonVersion": "3.10",
-  "extraPaths": ["venv/lib/python3.10/site-packages"]
+  "venv": "venv"
 }
